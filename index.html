@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix WSL — PenguineDavid</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --green: #00ff41;
+            --green-dim: #00aa2a;
+            --green-faint: #003d10;
+            --blue: #4fc3f7;
+            --blue-dim: #0288d1;
+            --cyan: #00fff5;
+            --white: #dcdcdc;
+            --bg: #000;
+            --red-dot: #ff5f57;
+            --yellow-dot: #ffbd2e;
+            --green-dot: #27c93f;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            overflow: hidden;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--green);
+            cursor: text;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #crt {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0, 0, 0, .18) 2px, rgba(0, 0, 0, .18) 4px);
+        }
+
+        #vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 51;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .75) 100%);
+        }
+
+        @keyframes flicker {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            91% {
+                opacity: 1
+            }
+
+            92% {
+                opacity: .35
+            }
+
+            93% {
+                opacity: 1
+            }
+
+            95% {
+                opacity: .75
+            }
+
+            96% {
+                opacity: 1
+            }
+        }
+
+        #app {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            animation: flicker 9s infinite;
+        }
+
+        /* ── Topbar ── */
+        #topbar {
+            height: 28px;
+            background: rgba(45, 45, 45, .92);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 7px;
+            flex-shrink: 0;
+            border-bottom: 1px solid #1a1a1a;
+            user-select: none;
+            cursor: default;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: filter .1s;
+            flex-shrink: 0;
+        }
+
+        .dot:hover {
+            filter: brightness(1.4)
+        }
+
+        #dot-red {
+            background: var(--red-dot)
+        }
+
+        #dot-yellow {
+            background: var(--yellow-dot)
+        }
+
+        #dot-green {
+            background: var(--green-dot)
+        }
+
+        #topbar-title {
+            flex: 1;
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 15px;
+            color: var(--white);
+            letter-spacing: .05em;
+            pointer-events: none;
+        }
+
+        #topbar-clock {
+            font-family: 'VT323', monospace;
+            font-size: 13px;
+            color: #888;
+            flex-shrink: 0;
+        }
+
+        /* ── Terminal ── */
+        #terminal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 18px 8px;
+            overflow: hidden;
+        }
+
+        #output {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--green-dim) transparent;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        #output::-webkit-scrollbar {
+            width: 3px
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background: var(--green-dim)
+        }
+
+        .line {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .t {
+            text-shadow: 0 0 8px currentColor, 0 0 2px rgba(0, 0, 0, .9);
+        }
+
+        /* colours */
+        .c-user {
+            color: #00ff41;
+        }
+
+        .c-host {
+            color: #00ff41;
+        }
+
+        .c-path {
+            color: var(--blue);
+        }
+
+        .c-sym {
+            color: var(--white);
+        }
+
+        .c-cmd {
+            color: var(--white);
+        }
+
+        .c-out {
+            color: var(--green-dim);
+        }
+
+        .c-hi {
+            color: var(--cyan);
+        }
+
+        .c-acc {
+            color: var(--blue);
+        }
+
+        .c-dim {
+            color: #1a5c2a;
+        }
+
+        .c-err {
+            color: #ff4444;
+        }
+
+        .c-ok {
+            color: var(--green);
+        }
+
+        .c-white {
+            color: var(--white);
+        }
+
+        .glow {
+            text-shadow: 0 0 10px currentColor, 0 0 25px currentColor;
+        }
+
+        /* ── Input row ── */
+        #input-row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #0a2e10;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        #input-prompt {
+            white-space: nowrap;
+        }
+
+        #cmd-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--white);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            flex: 1;
+            caret-color: var(--green);
+            text-shadow: 0 0 6px var(--green);
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0
+            }
+        }
+
+        #cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+            background: var(--green);
+            vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+            box-shadow: 0 0 6px var(--green);
+        }
+
+        /* ── Popups ── */
+        .popup {
+            position: fixed;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 4px 6px;
+            background: rgba(0, 0, 0, .6);
+            border: 1px solid;
+            pointer-events: none;
+            z-index: 30;
+            white-space: pre;
+            text-shadow: 0 0 5px currentColor;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div id="crt"></div>
+    <div id="vignette"></div>
+
+    <div id="app">
+        <div id="topbar">
+            <div class="dot" id="dot-red"></div>
+            <div class="dot" id="dot-yellow"></div>
+            <div class="dot" id="dot-green"></div>
+            <div id="topbar-title">Matrix WSL — PenguineDavid@portfolio:~ &copy; 2026 PenguineDavid. All Rights
+                Reserved.</div>
+            <div id="topbar-clock"></div>
+        </div>
+        <div id="terminal">
+            <div id="output"></div>
+            <div id="input-row">
+                <!-- Classic bash prompt: green user@host, white :, blue path, white $ -->
+                <span id="input-prompt"><span class="c-user">PenguineDavid</span><span class="c-white">@</span><span
+                        class="c-host">portfolio</span><span class="c-white">:</span><span class="c-path">~</span><span
+                        class="c-white">$&nbsp;</span></span>
+                <input id="cmd-input" type="text" autocomplete="off" spellcheck="false">
+                <span id="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // ═══════════════════════════════════════════════════════════
+        //  MATRIX RAIN + DONUT
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const CORRUPT = '!@#$%^&*()_+-=[]{};:<>?/\\|~`\'"';
+        const GLYPHS = ('01'.repeat(6) + CORRUPT).split('');
+        const FLARE = ['#00ff41', '#ffffff', '#ff4444', '#00fff5', '#ffff00'];
+
+        let cols = 0, rows = 0, cellW = 0, cellH = 14, drops = [];
+        let burstFrames = 0, idleFrames = 0;
+        const isBurst = () => burstFrames > 0;
+        const isIdle = () => idleFrames > 120;
+
+        let donutA = 0, donutB = 0, donutCache = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            cellW = Math.ceil(canvas.width / Math.floor(canvas.width / 10));
+            cols = Math.floor(canvas.width / cellW);
+            rows = Math.floor(canvas.height / cellH);
+            drops = [];
+            for (let x = 0; x < cols; x++) drops.push({
+                y: Math.random() * rows - rows,
+                speed: 0.1 + Math.random() * 0.4,
+                length: 5 + Math.floor(Math.random() * 10),
+                glitch: false, active: true, staticBurst: false, staticTimer: 0
+            });
+        }
+
+        function computeDonut() {
+            const out = new Array(1920).fill(' ');
+            const z = new Float32Array(1920);
+            for (let j = 0; j < 6.28; j += 0.07) {
+                for (let i = 0; i < 6.28; i += 0.02) {
+                    const c = Math.sin(i), d = Math.cos(j), e = Math.sin(donutA),
+                        f = Math.sin(j), g = Math.cos(donutA), h = d + 2,
+                        D = 1 / (c * h * e + f * g + 5),
+                        l = Math.cos(i), m = Math.cos(donutB), n = Math.sin(donutB),
+                        t = c * h * g - f * e;
+                    const xi = Math.round(40 + 30 * D * (l * h * m - t * n));
+                    const yi = Math.round(12 + 15 * D * (l * h * n + t * m));
+                    if (yi >= 0 && yi < 24 && xi >= 0 && xi < 80) {
+                        const o = xi + 80 * yi;
+                        const N = Math.floor(8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
+                        if (D > z[o]) { z[o] = D; out[o] = '.,-~:;=!*#$@'[N > 0 ? N % 12 : 0]; }
+                    }
+                }
+            }
+            donutCache = [];
+            for (let k = 0; k < 1920; k++)
+                if (out[k] !== ' ') donutCache.push({ nx: (k % 80) / 79, ny: Math.floor(k / 80) / 23, ch: out[k] });
+            donutA += 0.04; donutB += 0.02;
+        }
+
+        function drawFrame() {
+            ctx.fillStyle = 'rgba(0,0,0,0.18)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const sm = isBurst() ? 3.5 : isIdle() ? 0.3 : 1.0;
+            ctx.font = `${cellH}px 'Share Tech Mono',monospace`;
+
+            // ── Rain ──────────────────────────────────────────────
+            for (let x = 0; x < cols; x++) {
+                const d = drops[x];
+                if (d.staticBurst) {
+                    if (--d.staticTimer <= 0) { d.staticBurst = false; }
+                    else {
+                        for (let y = 0; y < rows; y++) {
+                            ctx.fillStyle = FLARE[Math.floor(Math.random() * 3)];
+                            ctx.fillText(CORRUPT[Math.floor(Math.random() * CORRUPT.length)], x * cellW, y * cellH);
+                        }
+                        continue;
+                    }
+                }
+                if (isBurst() && burstFrames > 70 && Math.random() < 0.0025) {
+                    d.staticBurst = true; d.staticTimer = 3 + Math.floor(Math.random() * 5); continue;
+                }
+                if (!d.active) {
+                    const ch = isBurst() ? 25 : isIdle() ? 1 : 5;
+                    if (Math.random() * 100 < ch) {
+                        d.active = true; d.y = Math.random() * 10 - 20;
+                        d.speed = 0.1 + Math.random() * 0.4; d.length = 5 + Math.floor(Math.random() * 10);
+                    }
+                    continue;
+                }
+                if (Math.random() * 100 < (isBurst() ? 15 : 3)) d.glitch = true;
+                if (Math.random() * 100 < (isBurst() ? 2 : 1)) d.glitch = false;
+
+                const tl = d.length + (isBurst() ? 8 : 0), iy = Math.floor(d.y);
+                for (let tr = 0; tr < tl; tr++) {
+                    const ty = iy - tr;
+                    if (ty < 0 || ty >= rows) continue;
+                    let ch, color;
+                    if (tr === 0) {
+                        ch = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                        color = isBurst() ? FLARE[Math.floor(Math.random() * FLARE.length)] : '#aaffaa';
+                    } else if (tr < 4) {
+                        ch = d.glitch ? CORRUPT[Math.floor(Math.random() * CORRUPT.length)] : (Math.random() < 0.5 ? '0' : '1');
+                        color = isBurst() ? FLARE[Math.floor(Math.random() * FLARE.length)] : (Math.random() < 0.5 ? '#00ff41' : '#00cc33');
+                    } else if (tr < 8) {
+                        ch = d.glitch ? CORRUPT[Math.floor(Math.random() * CORRUPT.length)] : (Math.random() < 0.5 ? '0' : '1');
+                        color = '#009922';
+                    } else {
+                        ch = Math.random() < 0.5 ? '0' : '1';
+                        color = '#006611';
+                    }
+                    ctx.fillStyle = color;
+                    ctx.fillText(ch, x * cellW, (ty + 1) * cellH);
+                }
+                d.y += d.speed * sm;
+                if (d.y - d.length > rows) d.active = false;
+            }
+
+            // ── Donut (scaled & centered to avoid spread on big screens) ──
+            computeDonut();
+            const donutCols = 80, donutRows = 24;
+            const margin = 0.15; // 15% on each side
+            const maxW = canvas.width * (1 - margin * 2);
+            const maxH = canvas.height * (1 - margin * 2);
+            const cellSize = Math.min(maxW / donutCols, maxH / donutRows);
+            const donutFontSize = Math.max(10, Math.floor(cellSize));
+            const offsetX = (canvas.width - donutCols * donutFontSize) / 2;
+            const offsetY = (canvas.height - donutRows * donutFontSize) / 2;
+
+            ctx.save();
+            ctx.font = `${donutFontSize}px 'Share Tech Mono',monospace`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#00ff41';
+            ctx.fillStyle = isBurst() ? '#00fff5' : '#00ff41';
+            for (const p of donutCache) {
+                const col = Math.round(p.nx * (donutCols - 1)); // 0 .. 79
+                const row = Math.round(p.ny * (donutRows - 1)); // 0 .. 23
+                ctx.fillText(p.ch, offsetX + col * donutFontSize, offsetY + (row + 1) * donutFontSize);
+            }
+            ctx.restore();
+
+            if (burstFrames > 0) burstFrames--; else idleFrames++;
+            requestAnimationFrame(drawFrame);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawFrame();
+
+        // ═══════════════════════════════════════════════════════════
+        //  MARGIN POPUPS
+        // ═══════════════════════════════════════════════════════════
+        const POPUP_TEMPLATES = [
+            { lines: ['[ ACCESS GRANTED ]', 'USER: root', 'LEVEL: 7 CLEARANCE'], color: '#00ff41' },
+            { lines: ['[ DECRYPTING... ]', 'KEY: 0x4F3A91C2', 'STATUS: OK'], color: '#00fff5' },
+            { lines: ['[ INTRUSION DET ]', 'SRC: 10.0.0.1', 'TRACING...'], color: '#4fc3f7' },
+            { lines: ['[ SYSTEM ALERT ]', 'PROC: 0xDEADBEEF', 'KILL? [Y/N]'], color: '#ff4444' },
+            { lines: ['[ DOWNLOADING ]', 'FILES: 1337', 'RATE: 9.6 Mb/s'], color: '#00ff41' },
+            { lines: ['[ BYPASS ACTIVE ]', 'PORT: 22/SSH', 'TUNNELED: YES'], color: '#00fff5' },
+            { lines: ['[ NULL PTR FAULT ]', 'ADDR: 0x00000000', 'CORE DUMPED'], color: '#ff4444' },
+            { lines: ['[ GITHUB UPLINK ]', 'REPO: PenguineDavid', 'SYNC: OK'], color: '#00ff41' },
+            { lines: ['[ HASH COLLIDE ]', 'MD5: BROKEN', 'EXPLOITING...'], color: '#4fc3f7' },
+            { lines: ['[ CONPTY INIT ]', 'COLS: 80 ROWS: 24', 'STATUS: READY'], color: '#00fff5' },
+        ];
+
+        function spawnPopup() {
+            const t = POPUP_TEMPLATES[Math.floor(Math.random() * POPUP_TEMPLATES.length)];
+            const el = document.createElement('div');
+            el.className = 'popup';
+            el.style.color = t.color;
+            el.style.borderColor = t.color;
+            el.style.boxShadow = `0 0 8px ${t.color}55`;
+            el.textContent = t.lines.join('\n');
+            el.style[Math.random() < 0.5 ? 'left' : 'right'] = '4px';
+            el.style.top = (40 + Math.random() * (window.innerHeight - 120)) + 'px';
+            document.body.appendChild(el);
+            const dur = 2000 + Math.random() * 2000;
+            let elapsed = 0;
+            const iv = setInterval(() => {
+                elapsed += 80;
+                if (elapsed > dur - 500) el.style.opacity = Math.random() > 0.4 ? '1' : '0.2';
+                if (elapsed > dur) { clearInterval(iv); el.remove(); }
+            }, 80);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        //  GITHUB API  — batched fetching to stay under rate limit
+        // ═══════════════════════════════════════════════════════════
+        const GH_USER = 'PenguineDavid';
+        const GH_API = 'https://api.github.com';
+        const GH_HDR = { Accept: 'application/vnd.github.v3+json' };
+        const cache = { profile: null, repos: null, languages: null };
+
+        async function ghGet(url) {
+            const r = await fetch(url, { headers: GH_HDR });
+            if (!r.ok) throw new Error(`HTTP ${r.status} — ${url}`);
+            return r.json();
+        }
+
+        async function batchedAll(fns, size = 5) {
+            const results = [];
+            for (let i = 0; i < fns.length; i += size) {
+                const batch = await Promise.allSettled(fns.slice(i, i + size).map(f => f()));
+                results.push(...batch);
+            }
+            return results;
+        }
+
+        async function getProfile() {
+            if (!cache.profile) cache.profile = await ghGet(`${GH_API}/users/${GH_USER}`);
+            return cache.profile;
+        }
+
+        async function getRepos() {
+            if (!cache.repos) {
+                const [p1, p2] = await Promise.all([
+                    ghGet(`${GH_API}/users/${GH_USER}/repos?per_page=100&sort=pushed&page=1`),
+                    ghGet(`${GH_API}/users/${GH_USER}/repos?per_page=100&sort=pushed&page=2`),
+                ]);
+                cache.repos = [...p1, ...p2].filter((r, i, a) => a.findIndex(x => x.id === r.id) === i);
+            }
+            return cache.repos;
+        }
+
+        async function getLanguages() {
+            if (cache.languages) return cache.languages;
+            const repos = await getRepos();
+            const own = repos.filter(r => !r.fork);
+            const results = await batchedAll(own.map(r => () => ghGet(r.languages_url)), 5);
+            const totals = {};
+            results.forEach(res => {
+                if (res.status !== 'fulfilled') return;
+                for (const [lang, bytes] of Object.entries(res.value))
+                    totals[lang] = (totals[lang] || 0) + bytes;
+            });
+            const total = Object.values(totals).reduce((a, b) => a + b, 0) || 1;
+            cache.languages = Object.fromEntries(
+                Object.entries(totals)
+                    .map(([k, v]) => [k, v / total * 100])
+                    .sort((a, b) => b[1] - a[1])
+            );
+            return cache.languages;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        //  TERMINAL HELPERS
+        // ═══════════════════════════════════════════════════════════
+        const output = document.getElementById('output');
+        const cmdInput = document.getElementById('cmd-input');
+
+        const PROMPT_HTML =
+            `<span class="c-user">PenguineDavid</span>` +
+            `<span class="c-white">@</span>` +
+            `<span class="c-host">portfolio</span>` +
+            `<span class="c-white">:</span>` +
+            `<span class="c-path">~</span>` +
+            `<span class="c-white">$&nbsp;</span>`;
+
+        function bar(pct, width = 18) {
+            const f = Math.round(pct / 100 * width);
+            return `<span style="color:#00ff41">${'█'.repeat(f)}</span><span style="color:#003d10">${'░'.repeat(width - f)}</span>`;
+        }
+        function append(html) {
+            const d = document.createElement('div');
+            d.className = 'line t'; d.innerHTML = html;
+            output.appendChild(d); output.scrollTop = output.scrollHeight;
+        }
+        function blank() { append('&nbsp;'); }
+        function removeLast() { if (output.lastElementChild) output.lastElementChild.remove(); }
+
+        const LANG_META = {
+            'C++': 'Win32, ANTLR4 runtimes, ConPTY, low-level tooling',
+            'C': 'Embedded patterns, systems programming',
+            'Java': 'Minecraft Java Edition, JVM internals',
+            'JavaScript': 'ES2022+, class APIs, canvas, n-gram NLP',
+            'TypeScript': 'Typed JS, tooling & config',
+            'Python': 'Manim, config layers, data pipelines',
+            'HTML': 'Semantic markup, canvas, game UIs',
+            'CSS': 'Animations, custom vars, theming systems',
+            'PHP': 'Server-side tooling, curl_multi, Apache',
+            'Shell': 'Build scripts, automation',
+            'Makefile': 'Build system definitions',
+            'CMake': 'Cross-platform build configuration',
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  ASCII ART  — "PD" (PenguineDavid)
+        // ═══════════════════════════════════════════════════════════
+        const ASCII_PD = [
+            ' ██████╗ ██████╗ ',
+            ' ██╔══██╗██╔══██╗',
+            ' ██████╔╝██║  ██║',
+            ' ██╔═══╝ ██║  ██║',
+            ' ██║     ██████╔╝',
+            ' ╚═╝     ╚═════╝ ',
+        ];
+
+        // ═══════════════════════════════════════════════════════════
+        //  COMMANDS
+        // ═══════════════════════════════════════════════════════════
+        const COMMANDS = {
+
+            help() {
+                blank();
+                append(`<span class="c-hi">┌─[ AVAILABLE COMMANDS ]──────────────────────────────┐</span>`);
+                [
+                    ['whoami', 'Identity & profile (live from GitHub)'],
+                    ['skills', 'Language breakdown (live from GitHub)'],
+                    ['projects', 'Repos (live from GitHub)'],
+                    ['contact', 'How to reach me'],
+                    ['clear', 'Clear the terminal'],
+                    ['help', 'Show this menu'],
+                ].forEach(([cmd, desc]) => {
+                    append(`<span class="c-hi">│</span>  <span class="c-acc">${cmd.padEnd(12)}</span><span class="c-dim">──</span> <span class="c-out">${desc}</span>`);
+                });
+                append(`<span class="c-hi">└─────────────────────────────────────────────────────┘</span>`);
+                blank();
+            },
+
+            async whoami() {
+                blank();
+                append(`<span class="c-dim">  [ fetching profile from api.github.com... ]</span>`);
+                let p;
+                try { p = await getProfile(); } catch (e) {
+                    removeLast();
+                    append(`  <span class="c-err">GitHub API error: ${e.message}</span>`); blank(); return;
+                }
+                removeLast();
+
+                ASCII_PD.forEach(line => append(`<span class="c-hi glow">${line}</span>`));
+                append(`<span class="c-hi glow">   PenguineDavid</span>`);
+                blank();
+
+                const row = (label, val, cls = 'c-out') =>
+                    append(`  <span class="c-acc">${label.padEnd(11)}</span><span class="c-dim"> :: </span><span class="${cls}">${val}</span>`);
+
+                row('USER', p.name || p.login, 'c-ok');
+                row('GITHUB', `github.com/${p.login}`, 'c-hi');
+                if (p.bio) row('BIO', p.bio);
+                if (p.location) row('LOCATION', p.location);
+                row('REPOS', `${p.public_repos} public repositories`);
+                row('FOLLOWERS', String(p.followers));
+                if (p.company) row('COMPANY', p.company);
+                blank();
+                append(`  <span class="c-out">Building things where software engineering meets</span>`);
+                append(`  <span class="c-out">interactive systems — redstone CPUs to language</span>`);
+                append(`  <span class="c-out">runtimes and custom terminal emulators.</span>`);
+                blank();
+                append(`  <span class="c-dim">&gt; type </span><span class="c-acc">skills</span><span class="c-dim"> to see live language stats</span>`);
+                blank();
+            },
+
+            async skills() {
+                blank();
+                append(`<span class="c-dim">  [ fetching language data across all repos... ]</span>`);
+                let langs;
+                try { langs = await getLanguages(); } catch (e) {
+                    removeLast();
+                    append(`  <span class="c-err">GitHub API error: ${e.message}</span>`); blank(); return;
+                }
+                removeLast();
+
+                append(`<span class="c-hi">╔══════════════════════════════════════════════════════╗</span>`);
+                append(`<span class="c-hi">║          TECH STACK // LIVE FROM GITHUB             ║</span>`);
+                append(`<span class="c-hi">╚══════════════════════════════════════════════════════╝</span>`);
+                blank();
+                append(`  <span class="c-acc">◈ LANGUAGES</span>  <span class="c-dim">(bytes aggregated across all own repos)</span>`);
+                blank();
+
+                const entries = Object.entries(langs);
+                const top = entries.slice(0, 12);
+                const other = entries.slice(12).reduce((a, [, v]) => a + v, 0);
+
+                top.forEach(([lang, pct]) => {
+                    const desc = LANG_META[lang] || '';
+                    const label = lang.padEnd(16);
+                    const pctStr = pct.toFixed(2).padStart(6);
+                    append(`    <span class="c-hi">${label}</span>${bar(pct)} <span class="c-ok">${pctStr}%</span>`);
+                    if (desc) append(`    <span class="c-dim">   ${desc}</span>`);
+                });
+                if (other > 0.05)
+                    append(`    <span class="c-hi">${'Other'.padEnd(16)}</span>${bar(other)} <span class="c-ok">${other.toFixed(2).padStart(6)}%</span>`);
+
+                blank();
+                append(`  <span class="c-dim">  Data is live — re-run </span><span class="c-acc">skills</span><span class="c-dim"> to refresh.</span>`);
+                blank();
+            },
+
+            async projects() {
+                blank();
+                append(`<span class="c-dim">  [ fetching repos from api.github.com... ]</span>`);
+                let repos;
+                try { repos = await getRepos(); } catch (e) {
+                    removeLast();
+                    append(`  <span class="c-err">GitHub API error: ${e.message}</span>`); blank(); return;
+                }
+                removeLast();
+
+                const own = repos
+                    .filter(r => !r.fork)
+                    .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
+                    .slice(0, 10);
+
+                append(`<span class="c-hi">┌─[ REPOS // LIVE FROM GITHUB ]───────────────────────┐</span>`);
+                blank();
+                own.forEach(r => {
+                    const stars = r.stargazers_count > 0 ? ` ★${r.stargazers_count}` : '';
+                    const lang = r.language ? ` [${r.language}]` : '';
+                    const desc = (r.description || '(no description)').slice(0, 70);
+                    const pushed = (r.pushed_at || '').slice(0, 10);
+                    append(`  <span class="c-hi glow">▸ ${r.name}</span><span class="c-dim">${lang}${stars}</span>`);
+                    append(`    <span class="c-out">${desc}</span>`);
+                    append(`    <span class="c-dim">pushed: ${pushed}</span>`);
+                    blank();
+                });
+
+                const ownTotal = repos.filter(r => !r.fork).length;
+                append(`<span class="c-hi">└─────────────────────────────────────────────────────┘</span>`);
+                append(`  <span class="c-dim">Showing ${own.length} of ${ownTotal} own repos → </span><span class="c-hi">github.com/${GH_USER}</span>`);
+                blank();
+            },
+
+            contact() {
+                blank();
+                append(`<span class="c-hi">┌─[ CONTACT ]─────────────────────────────────────────┐</span>`);
+                blank();
+                append(`  <span class="c-acc">GITHUB   </span> <span class="c-hi">github.com/${GH_USER}</span>`);
+                append(`  <span class="c-acc">LOCATION </span> <span class="c-out">Sydney, NSW, Australia</span>`);
+                blank();
+                append(`  <span class="c-out">Best way: open an issue or discussion on any repo.</span>`);
+                blank();
+                append(`<span class="c-hi">└─────────────────────────────────────────────────────┘</span>`);
+                blank();
+            },
+
+            clear() { output.innerHTML = ''; },
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  INPUT
+        // ═══════════════════════════════════════════════════════════
+        const history = []; let histIdx = -1;
+
+        cmdInput.addEventListener('keydown', async e => {
+            if (e.key === 'Enter') {
+                const raw = cmdInput.value.trim();
+                const cmd = raw.toLowerCase();
+                cmdInput.value = '';
+                if (!raw) return;
+                append(`${PROMPT_HTML}<span class="c-white">${raw}</span>`);
+                history.unshift(raw); histIdx = -1;
+                burstFrames = 80; idleFrames = 0;
+                if (Math.random() < 0.6) spawnPopup();
+                if (COMMANDS[cmd]) {
+                    await COMMANDS[cmd]();
+                } else {
+                    blank();
+                    append(`  <span class="c-err">${raw}: command not found</span>`);
+                    append(`  <span class="c-dim">type </span><span class="c-acc">help</span><span class="c-dim"> for available commands</span>`);
+                    blank();
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (histIdx < history.length - 1) histIdx++;
+                cmdInput.value = history[histIdx] || '';
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                histIdx = Math.max(-1, histIdx - 1);
+                cmdInput.value = histIdx >= 0 ? history[histIdx] : '';
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                const partial = cmdInput.value.trim().toLowerCase();
+                const match = Object.keys(COMMANDS).find(k => k.startsWith(partial));
+                if (match) cmdInput.value = match;
+            } else if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault(); COMMANDS.clear();
+            } else {
+                if (!isBurst()) { idleFrames = 0; burstFrames = 8; }
+            }
+        });
+
+        document.addEventListener('click', () => cmdInput.focus());
+
+        // ── Clock ──────────────────────────────────────────────────
+        function tick() {
+            document.getElementById('topbar-clock').textContent =
+                new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+        }
+        tick(); setInterval(tick, 1000);
+
+        // ── Traffic lights ─────────────────────────────────────────
+        document.getElementById('dot-red').onclick = () => window.close();
+        document.getElementById('dot-yellow').onclick = () => { };
+        document.getElementById('dot-green').onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  BOOT SEQUENCE
+        // ═══════════════════════════════════════════════════════════
+        const BOOT = [
+            [`<span class="c-dim">BIOS v2.4.1 — PenguineDavid Systems</span>`, 60],
+            [`<span class="c-dim">Loading kernel modules.............................. <span class="c-ok">OK</span></span>`, 100],
+            [`<span class="c-dim">Mounting skill partitions........................... <span class="c-ok">OK</span></span>`, 110],
+            [`<span class="c-dim">Calibrating creativity engine....................... <span class="c-ok">OK</span></span>`, 120],
+            [`<span class="c-dim">Establishing GitHub uplink.......................... <span class="c-ok">OK</span></span>`, 130],
+            [`<span class="c-dim">Initialising ConPTY layer........................... <span class="c-ok">OK</span></span>`, 130],
+            [`<span class="c-dim">Suppressing imposter syndrome....................... <span class="c-acc">PARTIAL</span></span>`, 200],
+            [`&nbsp;`, 80],
+            ...ASCII_PD.map(line => [`<span class="c-hi glow">${line}</span>`, 35]),
+            [`<span class="c-hi glow">   PenguineDavid — Software Developer</span>`, 80],
+            [`&nbsp;`, 50],
+            [`  <span class="c-out">Full stack developer · Sydney, AU · github.com/${GH_USER} Licensed under Poly form non-commercial license 1.0.0</span>`, 70],
+            [`github.com/${GH_USER}/`, 80],
+            [`&nbsp;`, 80],
+            [`  <span class="c-dim">System ready. Type </span><span class="c-acc">help</span><span class="c-dim"> to begin.</span>`, 0],
+            [`&nbsp;`, 0],
+        ];
+
+        (function boot(i) {
+            if (i >= BOOT.length) { cmdInput.focus(); return; }
+            const [html, delay] = BOOT[i];
+            append(html);
+            setTimeout(() => boot(i + 1), delay);
+        })(0);
+    </script>
+</body>
+
+</html>
