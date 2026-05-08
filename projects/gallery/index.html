@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David S Gallery</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/bg.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/gallery.css">
+</head>
+
+<body>
+    <button class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">&#9776;</button>
+    <div class="sidebar-overlay"></div>
+
+    <nav>
+        <div class="nav-left">
+            <div class="breadcrumb"></div>
+        </div>
+        <a href="/" class="brand">David S</a>
+    </nav>
+
+    <div class="header-wrap">
+        <header class="site-header">
+            <img class="bg-img" src="/gfx/bg/PCB.jpg" alt="">
+            <div class="colour-overlay"></div>
+        </header>
+        <div class="header-fade"></div>
+    </div>
+
+    <main>
+        <aside class="sidebar"></aside>
+        <div class="sidebar-spacer"></div>
+        <div class="content-area">
+
+            <h1>Gallery</h1>
+            <p class="gallery-sub">Screenshots, builds, and things worth showing.</p>
+
+            <div class="gallery-grid">
+
+                <div class="gallery-card" data-title="Amber WSL Terminal" data-desc="Amber minimalist WSL terminal."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/amber_laptop.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/amber_laptop.png"
+                        alt="Amber minimalist WSL terminal.">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">Amber WSL Terminal</p>
+                        <p class="gallery-card-copy">Amber minimalist WSL terminal.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-title="CPU Design" data-desc="A tool for designing CPU opcodes."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/cpu_design.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/cpu_design.png" alt="CPU Design">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">CPU Design</p>
+                        <p class="gallery-card-copy">A tool for designing CPU opcodes.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-title="HTTP Status" data-desc="A list of all the HTTP status codes."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/httpClient.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/httpClient.png" alt="HTTP Client">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">HTTP Status</p>
+                        <p class="gallery-card-copy">A list of all the HTTP status codes.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-title="Math Notes" data-desc="A math document."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/math.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/math.png" alt="Math Notes">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">Math Notes</p>
+                        <p class="gallery-card-copy">A math document.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-title="Matrix Terminal" data-desc="A matrix styled WSL terminal."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/matrix_laptop.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/matrix_laptop.png" alt="Matrix Terminal">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">Matrix Terminal</p>
+                        <p class="gallery-card-copy">A matrix styled WSL terminal.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-title="OOP Explanation" data-desc="An explanation document of OOP."
+                    data-copy="&copy; 2026 David S" data-src="/gfx/gallery/oop.png">
+                    <img class="gallery-card-img" src="/gfx/gallery/oop.png" alt="OOP Design">
+                    <div class="gallery-card-body">
+                        <p class="gallery-card-title">OOP Explanation</p>
+                        <p class="gallery-card-copy">An explanation document of OOP.</p>
+                    </div>
+                    <div class="gallery-card-footer">
+                        <span class="gallery-card-copy-tag">&copy; 2026 David S</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <span class="footer-text">© 2026 David S. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX -->
+    <div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <!-- Prev / Next sit outside the inner panel so they span the full lightbox height -->
+        <button class="lightbox-arrow lightbox-arrow--prev" id="lightbox-prev"
+            aria-label="Previous image">&#8249;</button>
+        <div class="gallery-lightbox-inner">
+            <button class="gallery-lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+            <img class="gallery-lightbox-img" id="lightbox-img" src="" alt="">
+            <div class="gallery-lightbox-meta">
+                <div>
+                    <p class="gallery-lightbox-title" id="lightbox-title"></p>
+                    <p class="gallery-lightbox-desc" id="lightbox-desc"></p>
+                </div>
+                <p class="gallery-lightbox-copy" id="lightbox-copy"></p>
+            </div>
+        </div>
+        <button class="lightbox-arrow lightbox-arrow--next" id="lightbox-next" aria-label="Next image">&#8250;</button>
+    </div>
+
+    <script src="/js/nav.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/gallery.js"></script>
+</body>
+
+</html>

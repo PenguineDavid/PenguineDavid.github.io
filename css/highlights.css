@@ -1,0 +1,363 @@
+/* -- HIGHLIGHTS PAGE --------------------------------------------------------*/
+
+.project-section {
+    margin-bottom: 5rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(160, 120, 255, 0.1);
+}
+
+.project-section:last-child {
+    border-bottom: none;
+}
+
+/* -- SECTION H1 WITH # ANCHOR --------------------------------------------- */
+.section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #f0eaff;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* override the global centred heading rule from main.css */
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.section-anchor {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #a855f7;
+    border: 1.5px solid #a855f7;
+    border-radius: 6px;
+    padding: 0.05rem 0.45rem;
+    letter-spacing: 0;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    user-select: none;
+}
+
+.section-anchor:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+}
+
+.section-tagline {
+    font-size: 0.88rem;
+    color: rgba(210, 195, 255, 0.5);
+    margin-bottom: 2rem;
+    margin-top: 0.2rem;
+    text-align: left;
+}
+
+/* -- COLLAPSIBLE H2 SECTIONS ----------------------------------------------- */
+.doc-section {
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(160, 120, 255, 0.13);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.doc-section-toggle {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.025);
+    border: none;
+    cursor: pointer;
+    padding: 0.85rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: background 0.2s;
+}
+
+.doc-section-toggle:hover {
+    background: rgba(160, 120, 255, 0.07);
+}
+
+.doc-section-toggle h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #d4c8ff;
+    letter-spacing: 0.02em;
+    margin: 0;
+    text-align: left;
+}
+
+.doc-section-arrow {
+    flex-shrink: 0;
+    color: rgba(160, 120, 255, 0.5);
+    font-size: 0.9rem;
+    transition: transform 0.25s ease;
+}
+
+.doc-section.open .doc-section-arrow {
+    transform: rotate(180deg);
+}
+
+.doc-section-body {
+    display: none;
+    padding: 1.2rem 1.4rem 1.4rem 1.4rem;
+    border-top: 1px solid rgba(160, 120, 255, 0.1);
+}
+
+.doc-section.open .doc-section-body {
+    display: block;
+}
+
+/* -- H3 WITHIN SECTIONS --------------------------------------------------- */
+.doc-section-body h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(160, 120, 255, 0.7);
+    margin: 1.6rem 0 0.7rem 0;
+    text-align: left;
+}
+
+.doc-section-body h3:first-child {
+    margin-top: 0;
+}
+
+/* -- PROSE ----------------------------------------------------------------- */
+.doc-section-body p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(220, 210, 255, 0.65);
+    max-width: 72ch;
+    margin-bottom: 0.9rem;
+    text-align: left;
+}
+
+.doc-section-body p:last-child {
+    margin-bottom: 0;
+}
+
+.doc-section-body a {
+    color: #a78bfa;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(167, 139, 250, 0.3);
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.doc-section-body a:hover {
+    color: #c4b5fd;
+    border-color: rgba(196, 181, 253, 0.5);
+}
+
+/* -- INLINE CODE ----------------------------------------------------------- */
+.doc-section-body code,
+.section-tagline code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.8rem;
+    background: rgba(160, 120, 255, 0.1);
+    border: 1px solid rgba(160, 120, 255, 0.18);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    color: #c4b5fd;
+}
+
+/* -- LISTS ----------------------------------------------------------------- */
+.doc-section-body ul,
+.doc-section-body ol {
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+}
+
+.doc-section-body li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(220, 210, 255, 0.65);
+    margin-bottom: 0.4rem;
+    text-align: left;
+}
+
+.doc-section-body li code {
+    font-size: 0.78rem;
+}
+
+/* -- DIVIDER --------------------------------------------------------------- */
+.doc-section-body hr {
+    border: none;
+    border-top: 1px solid rgba(160, 120, 255, 0.1);
+    margin: 1.4rem 0;
+}
+
+/* -- TABLES ---------------------------------------------------------------- */
+.doc-section-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.2rem 0;
+    font-size: 0.82rem;
+    /* allow horizontal scroll on narrow screens without breaking layout */
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.doc-section-body thead tr {
+    background: rgba(160, 120, 255, 0.1);
+    border-bottom: 1px solid rgba(160, 120, 255, 0.25);
+}
+
+.doc-section-body thead th {
+    padding: 0.55rem 0.9rem;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(160, 120, 255, 0.8);
+    white-space: nowrap;
+}
+
+.doc-section-body tbody tr {
+    border-bottom: 1px solid rgba(160, 120, 255, 0.07);
+    transition: background 0.15s;
+}
+
+.doc-section-body tbody tr:last-child {
+    border-bottom: none;
+}
+
+.doc-section-body tbody tr:hover {
+    background: rgba(160, 120, 255, 0.04);
+}
+
+.doc-section-body tbody td {
+    padding: 0.5rem 0.9rem;
+    color: rgba(220, 210, 255, 0.7);
+    vertical-align: top;
+    line-height: 1.6;
+}
+
+.doc-section-body tbody td:first-child {
+    white-space: nowrap;
+    color: rgba(220, 210, 255, 0.9);
+}
+
+.doc-section-body .note {
+    font-size: 0.72rem;
+    color: rgba(160, 120, 255, 0.5);
+    font-style: italic;
+}
+
+/* -- CODE BLOCKS ----------------------------------------------------------- */
+.github-dark {
+    background: transparent;
+    border: 1px solid rgba(160, 120, 255, 0.15);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0 1rem 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #c9d1d9;
+    white-space: pre;
+}
+
+.github-dark code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    border-radius: 0;
+}
+
+.doc-section-body pre:not(.github-dark) {
+    background: rgba(10, 10, 16, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0 1rem 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: rgba(200, 200, 220, 0.7);
+    white-space: pre;
+}
+
+.doc-section-body pre:not(.github-dark) code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    border-radius: 0;
+}
+
+/* -- SYNTAX TOKENS --------------------------------------------------------- */
+.github-dark .keyword {
+    color: #ff7b72;
+}
+
+.github-dark .string {
+    color: #a5d6ff;
+}
+
+.github-dark .comment {
+    color: #8b949e;
+    font-style: italic;
+}
+
+.github-dark .function {
+    color: #d2a8ff;
+}
+
+.github-dark .number {
+    color: #79c0ff;
+}
+
+.github-dark .operator {
+    color: #ff7b72;
+}
+
+.github-dark .punctuation {
+    color: #c9d1d9;
+}
+
+.github-dark .variable {
+    color: #ffa657;
+}
+
+.github-dark .type {
+    color: #79c0ff;
+}
+
+/* -- NARROW (<560px): tighten doc section padding ------------------------- */
+@media (max-width: 560px) {
+    .doc-section-toggle {
+        padding: 0.75rem 0.9rem;
+    }
+
+    .doc-section-body {
+        padding: 1rem 0.9rem 1.1rem 0.9rem;
+    }
+
+    .github-dark,
+    .doc-section-body pre:not(.github-dark) {
+        font-size: 0.75rem;
+        padding: 0.75rem 0.8rem;
+    }
+
+    .section-title {
+        font-size: clamp(1.4rem, 7vw, 2rem);
+    }
+}

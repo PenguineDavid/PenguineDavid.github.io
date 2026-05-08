@@ -1,0 +1,168 @@
+/* -- REPO LIST --------------------------------------------------------------*/
+.repo-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* -- REPO CARD --------------------------------------------------------------*/
+.repo-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(160, 120, 255, 0.15);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.repo-card:hover {
+    background: rgba(160, 120, 255, 0.06);
+    border-color: rgba(160, 120, 255, 0.35);
+}
+
+/* -- CARD HEADER ------------------------------------------------------------*/
+.repo-header {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.repo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #cbb8ff;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+}
+
+.repo-name:hover {
+    color: #fff;
+}
+
+.repo-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.repo-lang {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(160, 120, 255, 0.9);
+    background: rgba(160, 120, 255, 0.12);
+    border: 1px solid rgba(160, 120, 255, 0.25);
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+}
+
+.repo-stat {
+    font-size: 0.72rem;
+    color: rgba(210, 195, 255, 0.45);
+}
+
+.repo-updated {
+    font-size: 0.68rem;
+    color: rgba(210, 195, 255, 0.3);
+    margin-left: auto;
+}
+
+.repo-desc {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: rgba(220, 210, 255, 0.6);
+    max-width: none;
+    margin-bottom: 0;
+}
+
+.repo-desc--empty {
+    color: rgba(220, 210, 255, 0.2);
+    font-style: italic;
+}
+
+.repo-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.repo-topic {
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: rgba(180, 160, 255, 0.6);
+    background: rgba(136, 85, 255, 0.08);
+    border: 1px solid rgba(136, 85, 255, 0.18);
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+}
+
+.repo-error {
+    color: rgba(255, 120, 120, 0.8);
+    font-size: 0.85rem;
+    margin-top: 2rem;
+}
+
+/* -- SKELETON ---------------------------------------------------------------*/
+.repo-card--skeleton {
+    pointer-events: none;
+}
+
+.skel {
+    background: linear-gradient(90deg,
+            rgba(160, 120, 255, 0.06) 0%,
+            rgba(160, 120, 255, 0.12) 50%,
+            rgba(160, 120, 255, 0.06) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 4px;
+}
+
+.skel--name {
+    width: 180px;
+    height: 16px;
+}
+
+.skel--meta {
+    width: 260px;
+    height: 12px;
+    margin-top: 2px;
+}
+
+.skel--desc {
+    width: 90%;
+    height: 12px;
+    margin-top: 0.6rem;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* -- NARROW (<520px): tighten card padding, hide updated date ------------- */
+@media (max-width: 520px) {
+    .repo-card {
+        padding: 0.9rem 1rem;
+    }
+
+    .repo-updated {
+        display: none;
+    }
+
+    /* Skeleton meta narrower on small screens */
+    .skel--meta {
+        width: 160px;
+    }
+}

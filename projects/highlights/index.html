@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David S Highlights</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/bg.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/highlights.css">
+</head>
+
+<body>
+    <!-- Mobile sidebar toggle button (only visible below 768px) -->
+    <button class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">&#9776;</button>
+    
+    <!-- Tap-outside overlay -->
+    <div class="sidebar-overlay"></div>
+
+    <nav>
+        <div class="nav-left">
+            <div class="breadcrumb"></div>
+        </div>
+        <a href="/" class="brand">David S</a>
+    </nav>
+    <div class="header-wrap">
+        <header class="site-header">
+            <img class="bg-img" src="/gfx/bg/PCB.jpg" alt="">
+            <div class="colour-overlay"></div>
+        </header>
+        <div class="header-fade"></div>
+    </div>
+    <main>
+        <aside class="sidebar"></aside>
+        <div class="sidebar-spacer"></div>
+        <div class="content-area">
+
+            This is a list of two of my favorite repos you can jump to them with these <a class="section-anchor" href="#kith-2-0">#</a> Kith-2.0 & <a class="section-anchor" href="#lfsr-random">#</a> lfsr_random.<br><br>
+            <!-- ===============================================================
+                 KITH-2.0
+            ================================================================ -->
+            <section class="project-section" id="kith-2-0">
+                <h1 class="section-title">
+                    <a class="section-anchor" href="https://github.com/PenguineDavid/kith-2.0">#</a>
+                    Kith-2.0
+                </h1>
+                <p class="section-tagline">A small compiled language that transpiles to C. Clean syntax, fast output, no
+                    runtime dependencies.</p>
+
+                <pre class="github-dark"><code><span class="keyword">func</span> <span class="function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+    <span class="keyword">str</span> <span class="variable">name</span> <span class="operator">=</span> <span class="string">"world"</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="string">$"Hello, </span><span class="punctuation">{</span><span class="variable">name</span><span class="punctuation">}</span><span class="string">!"</span><span class="punctuation">)</span>
+<span class="punctuation">}</span></code></pre>
+
+                <!-- Install -->
+                <div class="doc-section open">
+                    <button class="doc-section-toggle" aria-expanded="true">
+                        <h2>Install</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p><strong>Requirements:</strong> A C++ compiler (g++ / clang++) and gcc on your PATH.</p>
+                        <pre class="github-dark"><code><span class="comment"># clone and build</span>
+git clone https://github.com/PenguineDavid/Kith-2.0
+cd Kith-2.0/src
+g++ -std=c++17 main.cpp lexer.cpp parser.cpp codegen.cpp -o kith</code></pre>
+                        <p>Add <code>kith</code> to your PATH or run it directly from the project folder.</p>
+                    </div>
+                </div>
+
+                <!-- Usage -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Usage</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <pre class="github-dark"><code>kith source.kith              <span class="comment"># compiles to ./output</span>
+kith source.kith myprogram    <span class="comment"># compiles to ./myprogram</span>
+
+<span class="comment"># Flags</span>
+kith --keep-c source.kith     <span class="comment"># keeps the intermediate output.c for debugging</span>
+kith --bounds source.kith     <span class="comment"># enables runtime bounds checking on array accesses</span>
+kith --help</code></pre>
+                    </div>
+                </div>
+
+                <!-- Language Reference -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Language Reference</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+
+                        <h3>Types</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kith</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>int</code></td>
+                                    <td>32-bit integer</td>
+                                </tr>
+                                <tr>
+                                    <td><code>float</code></td>
+                                    <td>64-bit double</td>
+                                </tr>
+                                <tr>
+                                    <td><code>bool</code></td>
+                                    <td>Boolean (<code>true</code> / <code>false</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>str</code></td>
+                                    <td>String (<code>char*</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>int*</code> <code>str*</code> <code>float*</code></td>
+                                    <td>Pointer types</td>
+                                </tr>
+                                <tr>
+                                    <td><code>int[]</code> <code>float[]</code> <code>str[]</code></td>
+                                    <td>Stack arrays</td>
+                                </tr>
+                                <tr>
+                                    <td><code>MyStruct</code></td>
+                                    <td>User-defined struct</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Variables</h3>
+                        <pre
+                            class="github-dark"><code><span class="keyword">int</span>   <span class="variable">x</span>    <span class="operator">=</span> <span class="number">10</span>
+<span class="keyword">float</span> <span class="variable">pi</span>   <span class="operator">=</span> <span class="number">3.14159</span>
+<span class="keyword">bool</span>  <span class="variable">flag</span> <span class="operator">=</span> <span class="keyword">true</span>
+<span class="keyword">str</span>   <span class="variable">msg</span>  <span class="operator">=</span> <span class="string">"hello"</span>
+
+<span class="keyword">int</span><span class="operator">*</span>  <span class="variable">px</span>  <span class="operator">=</span> <span class="operator">&amp;</span><span class="variable">x</span>          <span class="comment">// pointer</span>
+<span class="keyword">int</span><span class="punctuation">[]</span> <span class="variable">arr</span> <span class="operator">=</span> <span class="punctuation">[</span><span class="number">1</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">3</span><span class="punctuation">]</span>   <span class="comment">// array (stack-allocated)</span></code></pre>
+
+                        <h3>Structs</h3>
+                        <pre
+                            class="github-dark"><code><span class="keyword">struct</span> <span class="variable">Vec2</span>
+<span class="punctuation">{</span>
+    <span class="keyword">float</span> <span class="variable">x</span>
+    <span class="keyword">float</span> <span class="variable">y</span>
+<span class="punctuation">}</span>
+
+<span class="variable">Vec2</span> <span class="variable">pos</span>  <span class="operator">=</span> <span class="function">Vec2</span><span class="punctuation">(</span><span class="number">1.0</span><span class="punctuation">,</span> <span class="number">2.5</span><span class="punctuation">)</span>
+<span class="function">print</span><span class="punctuation">(</span><span class="variable">pos</span><span class="punctuation">.</span><span class="variable">x</span><span class="punctuation">)</span>
+<span class="variable">pos</span><span class="punctuation">.</span><span class="variable">y</span> <span class="operator">=</span> <span class="number">9.9</span>
+
+<span class="variable">Vec2</span><span class="operator">*</span> <span class="variable">ppos</span> <span class="operator">=</span> <span class="operator">&amp;</span><span class="variable">pos</span>
+<span class="function">print</span><span class="punctuation">(</span><span class="variable">ppos</span><span class="operator">-&gt;</span><span class="variable">x</span><span class="punctuation">)</span>
+<span class="variable">ppos</span><span class="operator">-&gt;</span><span class="variable">x</span> <span class="operator">=</span> <span class="number">0.0</span></code></pre>
+                        <p>Struct constants use <code>::</code> — declare at global scope as
+                            <code>TypeName__ConstantName</code>:</p>
+                        <pre
+                            class="github-dark"><code><span class="comment">// accessed as Math::PI in expressions... coming soon</span>
+<span class="keyword">int</span> <span class="variable">Math__PI</span> <span class="operator">=</span> <span class="number">3</span></code></pre>
+
+                        <h3>Functions</h3>
+                        <pre class="github-dark"><code><span class="keyword">func</span> <span class="function">add</span><span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">a</span><span class="punctuation">,</span> <span class="keyword">int</span> <span class="variable">b</span><span class="punctuation">)</span>
+<span class="punctuation">{</span>
+    <span class="keyword">return</span> <span class="variable">a</span> <span class="operator">+</span> <span class="variable">b</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">func</span> <span class="function">greet</span><span class="punctuation">(</span><span class="keyword">str</span> <span class="variable">name</span><span class="punctuation">)</span>
+<span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="string">$"Hello, </span><span class="punctuation">{</span><span class="variable">name</span><span class="punctuation">}</span><span class="string">!"</span><span class="punctuation">)</span>
+<span class="punctuation">}</span></code></pre>
+
+                        <h3>Control Flow</h3>
+                        <pre class="github-dark"><code><span class="comment">// if / else</span>
+<span class="keyword">if</span> <span class="punctuation">(</span><span class="variable">x</span> <span class="operator">&gt;</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="string">"positive"</span><span class="punctuation">)</span>
+<span class="punctuation">}</span> <span class="keyword">else</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="string">"non-positive"</span><span class="punctuation">)</span>
+<span class="punctuation">}</span>
+
+<span class="comment">// while</span>
+<span class="keyword">while</span> <span class="punctuation">(</span><span class="variable">x</span> <span class="operator">&gt;</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="variable">x</span> <span class="operator">=</span> <span class="variable">x</span> <span class="operator">-</span> <span class="number">1</span>
+<span class="punctuation">}</span>
+
+<span class="comment">// do-while</span>
+<span class="keyword">do</span> <span class="punctuation">{</span>
+    <span class="variable">x</span> <span class="operator">=</span> <span class="variable">x</span> <span class="operator">+</span> <span class="number">1</span>
+<span class="punctuation">}</span> <span class="keyword">while</span> <span class="punctuation">(</span><span class="variable">x</span> <span class="operator">&lt;</span> <span class="number">10</span><span class="punctuation">)</span>
+
+<span class="comment">// for</span>
+<span class="keyword">for</span> <span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">&lt;</span> <span class="number">10</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">=</span> <span class="variable">i</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="variable">i</span><span class="punctuation">)</span>
+<span class="punctuation">}</span>
+
+<span class="comment">// foreach (requires an array with a known length)</span>
+<span class="keyword">int</span><span class="punctuation">[]</span> <span class="variable">nums</span> <span class="operator">=</span> <span class="punctuation">[</span><span class="number">10</span><span class="punctuation">,</span> <span class="number">20</span><span class="punctuation">,</span> <span class="number">30</span><span class="punctuation">]</span>
+<span class="keyword">foreach</span> <span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">n</span> <span class="keyword">in</span> <span class="variable">nums</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="variable">n</span><span class="punctuation">)</span>
+<span class="punctuation">}</span>
+
+<span class="comment">// switch - works on both int and str</span>
+<span class="keyword">switch</span> <span class="punctuation">(</span><span class="variable">code</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="keyword">case</span> <span class="number">1</span>   <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"one"</span><span class="punctuation">)</span>   <span class="punctuation">}</span>
+    <span class="keyword">case</span> <span class="number">2</span>   <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"two"</span><span class="punctuation">)</span>   <span class="punctuation">}</span>
+    <span class="keyword">default</span>  <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"other"</span><span class="punctuation">)</span> <span class="punctuation">}</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">switch</span> <span class="punctuation">(</span><span class="variable">lang</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="keyword">case</span> <span class="string">"kith"</span> <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"Kith!"</span><span class="punctuation">)</span> <span class="punctuation">}</span>
+    <span class="keyword">case</span> <span class="string">"c"</span>    <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"C"</span><span class="punctuation">)</span>     <span class="punctuation">}</span>
+    <span class="keyword">default</span>     <span class="punctuation">{</span> <span class="function">print</span><span class="punctuation">(</span><span class="string">"?"</span><span class="punctuation">)</span>     <span class="punctuation">}</span>
+<span class="punctuation">}</span></code></pre>
+
+                        <h3>Operators</h3>
+                        <table class="operators-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Operators</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Arithmetic</td>
+                                    <td><code>+ - * / % **</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Comparison</td>
+                                    <td><code>&lt; &gt; &lt;= &gt;= == != === !==</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Logical</td>
+                                    <td><code>&amp;&amp; || ^^ ! and or xor not</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Bitwise</td>
+                                    <td><code>&amp; | ^ ~ &lt;&lt; &gt;&gt; &gt;&gt;&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Ternary</td>
+                                    <td><code>cond ? a : b</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Null-coalescing</td>
+                                    <td><code>a ?? b</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Increment</td>
+                                    <td><code>x++ x-- ++x --x</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Member access</td>
+                                    <td><code>. -&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Index</td>
+                                    <td><code>arr[i]</code> <span class="note">read &amp; write</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Address / deref</td>
+                                    <td><code>&amp;x *px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Cast</td>
+                                    <td><code>int(x) float(x) str(x) bool(x)</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Typeof</td>
+                                    <td><code>typeof x</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Delete</td>
+                                    <td><code>delete x</code> <span class="note">calls free(x)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Strings</h3>
+                        <pre
+                            class="github-dark"><code><span class="keyword">str</span> <span class="variable">a</span> <span class="operator">=</span> <span class="string">"normal string"</span>
+<span class="keyword">str</span> <span class="variable">b</span> <span class="operator">=</span> <span class="string">r"raw \n no escape"</span>               <span class="comment">// backslash not processed</span>
+<span class="keyword">str</span> <span class="variable">c</span> <span class="operator">=</span> <span class="string">$"x is </span><span class="punctuation">{</span><span class="variable">x</span><span class="punctuation">}</span><span class="string">, y is </span><span class="punctuation">{</span><span class="variable">y</span><span class="punctuation">}</span><span class="string">"</span>           <span class="comment">// interpolated - heap allocated</span>
+<span class="keyword">str</span> <span class="variable">d</span> <span class="operator">=</span> <span class="string">"""
+multi
+line
+"""</span>
+
+<span class="function">free</span><span class="punctuation">(</span><span class="variable">c</span><span class="punctuation">)</span>  <span class="comment">// free heap-allocated strings when done</span></code></pre>
+
+                        <h3>Exceptions</h3>
+                        <pre class="github-dark"><code><span class="keyword">try</span> <span class="punctuation">{</span>
+    <span class="keyword">throw</span> <span class="string">"something went wrong"</span>
+<span class="punctuation">}</span> <span class="keyword">catch</span> <span class="punctuation">(</span><span class="variable">e</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="variable">e</span><span class="punctuation">)</span>
+<span class="punctuation">}</span> <span class="keyword">finally</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="string">"always runs"</span><span class="punctuation">)</span>
+<span class="punctuation">}</span></code></pre>
+                        <p>Exceptions are implemented with <code>setjmp</code>/<code>longjmp</code>. An uncaught
+                            <code>throw</code> prints to stderr and exits with code 1.</p>
+
+                        <h3>Arrays</h3>
+                        <pre class="github-dark"><code><span class="keyword">int</span><span class="punctuation">[]</span> <span class="variable">arr</span> <span class="operator">=</span> <span class="punctuation">[</span><span class="number">1</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">3</span><span class="punctuation">,</span> <span class="number">4</span><span class="punctuation">,</span> <span class="number">5</span><span class="punctuation">]</span>
+
+<span class="function">print</span><span class="punctuation">(</span><span class="variable">arr</span><span class="punctuation">[</span><span class="number">0</span><span class="punctuation">]</span><span class="punctuation">)</span>        <span class="comment">// read</span>
+<span class="variable">arr</span><span class="punctuation">[</span><span class="number">2</span><span class="punctuation">]</span> <span class="operator">=</span> <span class="number">99</span>          <span class="comment">// write</span>
+<span class="function">print</span><span class="punctuation">(</span><span class="function">len</span><span class="punctuation">(</span><span class="variable">arr</span><span class="punctuation">)</span><span class="punctuation">)</span>      <span class="comment">// 5 -- companion _len variable</span>
+
+<span class="keyword">foreach</span> <span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">x</span> <span class="keyword">in</span> <span class="variable">arr</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="variable">x</span><span class="punctuation">)</span>
+<span class="punctuation">}</span></code></pre>
+                        <p>Compile with <code>--bounds</code> for runtime bounds checking:</p>
+                        <pre class="github-dark"><code>kith --bounds myprogram.kith
+<span class="comment"># arr[10] on a 3-element array prints:</span>
+<span class="comment"># Bounds check failed: index 10 out of range [0,3)</span>
+<span class="comment"># and exits with code 1</span></code></pre>
+
+                        <h3>Includes</h3>
+                        <pre
+                            class="github-dark"><code><span class="keyword">include</span> <span class="string">"utils.kith"</span>   <span class="comment">// parsed and merged inline</span>
+<span class="keyword">include</span> <span class="string">"mylib.h"</span>     <span class="comment">// passed through as #include "mylib.h" in generated C</span></code></pre>
+
+                        <h3>Built-in Functions</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Function</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>print(x)</code></td>
+                                    <td>Print value followed by newline</td>
+                                </tr>
+                                <tr>
+                                    <td><code>len(arr)</code></td>
+                                    <td>Length of a named array</td>
+                                </tr>
+                                <tr>
+                                    <td><code>free(x)</code></td>
+                                    <td>Free a heap-allocated value</td>
+                                </tr>
+                                <tr>
+                                    <td><code>toInt(s)</code></td>
+                                    <td>Parse string to int</td>
+                                </tr>
+                                <tr>
+                                    <td><code>toFloat(s)</code></td>
+                                    <td>Parse string to float</td>
+                                </tr>
+                                <tr>
+                                    <td><code>toStr(n)</code></td>
+                                    <td>Convert int to string (heap-allocated)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>input()</code></td>
+                                    <td>Read a line from stdin (heap-allocated, strips newline)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>sqrt(x)</code></td>
+                                    <td>Square root</td>
+                                </tr>
+                                <tr>
+                                    <td><code>abs(x)</code></td>
+                                    <td>Absolute value</td>
+                                </tr>
+                                <tr>
+                                    <td><code>floor(x)</code> <code>ceil(x)</code></td>
+                                    <td>Floor / ceiling</td>
+                                </tr>
+                                <tr>
+                                    <td><code>min(a, b)</code> <code>max(a, b)</code></td>
+                                    <td>Minimum / maximum</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>How It Works</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>Kith is a transpiler. It compiles your source to C, then calls gcc to produce the final
+                            binary. The intermediate <code>output.c</code> file is deleted automatically unless you pass
+                            <code>--keep-c</code>.</p>
+                        <pre
+                            class="github-dark"><code>source.kith  -&gt;  [Lexer]  -&gt;  [Parser]  -&gt;  [AST]  -&gt;  [CodeGen]  -&gt;  output.c  -&gt;  gcc  -&gt;  binary</code></pre>
+                        <p>This means you get fast native binaries with zero runtime overhead, and you can drop in any C
+                            library via <code>include "header.h"</code>.</p>
+                    </div>
+                </div>
+
+                <!-- Example Programs -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Example Programs</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+
+                        <h3>FizzBuzz</h3>
+                        <pre class="github-dark"><code><span class="keyword">func</span> <span class="function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+    <span class="keyword">for</span> <span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">&lt;=</span> <span class="number">20</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">=</span> <span class="variable">i</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+        <span class="keyword">if</span> <span class="punctuation">(</span><span class="variable">i</span> <span class="operator">%</span> <span class="number">15</span> <span class="operator">==</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="function">print</span><span class="punctuation">(</span><span class="string">"FizzBuzz"</span><span class="punctuation">)</span>
+        <span class="punctuation">}</span> <span class="keyword">else if</span> <span class="punctuation">(</span><span class="variable">i</span> <span class="operator">%</span> <span class="number">3</span> <span class="operator">==</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="function">print</span><span class="punctuation">(</span><span class="string">"Fizz"</span><span class="punctuation">)</span>
+        <span class="punctuation">}</span> <span class="keyword">else if</span> <span class="punctuation">(</span><span class="variable">i</span> <span class="operator">%</span> <span class="number">5</span> <span class="operator">==</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="function">print</span><span class="punctuation">(</span><span class="string">"Buzz"</span><span class="punctuation">)</span>
+        <span class="punctuation">}</span> <span class="keyword">else</span> <span class="punctuation">{</span>
+            <span class="function">print</span><span class="punctuation">(</span><span class="variable">i</span><span class="punctuation">)</span>
+        <span class="punctuation">}</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span></code></pre>
+
+                        <h3>Fibonacci</h3>
+                        <pre class="github-dark"><code><span class="keyword">func</span> <span class="function">fib</span><span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">n</span><span class="punctuation">)</span>
+<span class="punctuation">{</span>
+    <span class="keyword">if</span> <span class="punctuation">(</span><span class="variable">n</span> <span class="operator">&lt;=</span> <span class="number">1</span><span class="punctuation">)</span> <span class="punctuation">{</span> <span class="keyword">return</span> <span class="variable">n</span> <span class="punctuation">}</span>
+    <span class="keyword">return</span> <span class="function">fib</span><span class="punctuation">(</span><span class="variable">n</span> <span class="operator">-</span> <span class="number">1</span><span class="punctuation">)</span> <span class="operator">+</span> <span class="function">fib</span><span class="punctuation">(</span><span class="variable">n</span> <span class="operator">-</span> <span class="number">2</span><span class="punctuation">)</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">func</span> <span class="function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+    <span class="keyword">for</span> <span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">&lt;</span> <span class="number">10</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">=</span> <span class="variable">i</span> <span class="operator">+</span> <span class="number">1</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+        <span class="function">print</span><span class="punctuation">(</span><span class="function">fib</span><span class="punctuation">(</span><span class="variable">i</span><span class="punctuation">)</span><span class="punctuation">)</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span></code></pre>
+
+                        <h3>Structs and Methods</h3>
+                        <pre class="github-dark"><code><span class="keyword">struct</span> <span class="variable">Point</span>
+<span class="punctuation">{</span>
+    <span class="keyword">int</span> <span class="variable">x</span>
+    <span class="keyword">int</span> <span class="variable">y</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">func</span> <span class="function">distance</span><span class="punctuation">(</span><span class="variable">Point</span> <span class="variable">a</span><span class="punctuation">,</span> <span class="variable">Point</span> <span class="variable">b</span><span class="punctuation">)</span>
+<span class="punctuation">{</span>
+    <span class="keyword">int</span> <span class="variable">dx</span> <span class="operator">=</span> <span class="variable">a</span><span class="punctuation">.</span><span class="variable">x</span> <span class="operator">-</span> <span class="variable">b</span><span class="punctuation">.</span><span class="variable">x</span>
+    <span class="keyword">int</span> <span class="variable">dy</span> <span class="operator">=</span> <span class="variable">a</span><span class="punctuation">.</span><span class="variable">y</span> <span class="operator">-</span> <span class="variable">b</span><span class="punctuation">.</span><span class="variable">y</span>
+    <span class="keyword">return</span> <span class="function">sqrt</span><span class="punctuation">(</span><span class="variable">dx</span> <span class="operator">*</span> <span class="variable">dx</span> <span class="operator">+</span> <span class="variable">dy</span> <span class="operator">*</span> <span class="variable">dy</span><span class="punctuation">)</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">func</span> <span class="function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+    <span class="variable">Point</span> <span class="variable">origin</span> <span class="operator">=</span> <span class="function">Point</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">)</span>
+    <span class="variable">Point</span> <span class="variable">target</span> <span class="operator">=</span> <span class="function">Point</span><span class="punctuation">(</span><span class="number">3</span><span class="punctuation">,</span> <span class="number">4</span><span class="punctuation">)</span>
+    <span class="function">print</span><span class="punctuation">(</span><span class="function">distance</span><span class="punctuation">(</span><span class="variable">origin</span><span class="punctuation">,</span> <span class="variable">target</span><span class="punctuation">)</span><span class="punctuation">)</span>    <span class="comment">// 5</span>
+<span class="punctuation">}</span></code></pre>
+
+                        <h3>Exception Handling</h3>
+                        <pre class="github-dark"><code><span class="keyword">func</span> <span class="function">divide</span><span class="punctuation">(</span><span class="keyword">int</span> <span class="variable">a</span><span class="punctuation">,</span> <span class="keyword">int</span> <span class="variable">b</span><span class="punctuation">)</span>
+<span class="punctuation">{</span>
+    <span class="keyword">if</span> <span class="punctuation">(</span><span class="variable">b</span> <span class="operator">==</span> <span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+        <span class="keyword">throw</span> <span class="string">"division by zero"</span>
+    <span class="punctuation">}</span>
+    <span class="keyword">return</span> <span class="variable">a</span> <span class="operator">/</span> <span class="variable">b</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">func</span> <span class="function">main</span><span class="punctuation">()</span>
+<span class="punctuation">{</span>
+    <span class="keyword">try</span> <span class="punctuation">{</span>
+        <span class="function">print</span><span class="punctuation">(</span><span class="function">divide</span><span class="punctuation">(</span><span class="number">10</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">)</span><span class="punctuation">)</span>    <span class="comment">// 5</span>
+        <span class="function">print</span><span class="punctuation">(</span><span class="function">divide</span><span class="punctuation">(</span><span class="number">10</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">)</span><span class="punctuation">)</span>    <span class="comment">// throws</span>
+    <span class="punctuation">}</span> <span class="keyword">catch</span> <span class="punctuation">(</span><span class="variable">e</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+        <span class="function">print</span><span class="punctuation">(</span><span class="variable">e</span><span class="punctuation">)</span>                <span class="comment">// division by zero</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Compiler Flags -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Compiler Flags</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Flag</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>--keep-c</code></td>
+                                    <td>Keep <code>output.c</code> after compilation (useful for debugging generated C)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>--bounds</code></td>
+                                    <td>Enable runtime bounds checking for array index operations</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--help</code></td>
+                                    <td>Print usage information</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Known Limitations -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Known Limitations</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <ul>
+                            <li>All functions emit <code>int</code> as their C return type regardless of what they
+                                actually return</li>
+                            <li>No static type checking — type errors are caught by gcc, not the Kith compiler</li>
+                            <li>Stack-only arrays — no dynamic resizing</li>
+                            <li><code>print(arr[i])</code> on a float array requires assigning to a local first:
+                                <code>float v = arr[i]</code> then <code>print(v)</code></li>
+                            <li>Global array elements must be compile-time constants</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Coming Soon -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Coming Soon</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <ul>
+                            <li>Proper tracking and freeing of interpolated strings, including globals</li>
+                            <li>Python-style <code>for i in range(10)</code> and <code>for item in collection</code>
+                                syntax</li>
+                            <li>Heap-allocated arrays with dynamic resizing</li>
+                            <li>Optional return types: <code>func int add(int a, int b)</code> /
+                                <code>func void print(str s)</code></li>
+                            <li>Classes and inheritance mapped to C structs and functions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- License -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>License</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>PolyForm Noncommercial License 1.0.0 &mdash; <a
+                                href="https://github.com/PenguineDavid/Kith-2.0/blob/main/LICENSE.md" target="_blank"
+                                rel="noopener">LICENSE.md</a></p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ===========================================================
+                 LFSR_RANDOM
+            ================================================================ -->
+            <section class="project-section" id="lfsr-random">
+                <h1 class="section-title">
+                    <a class="section-anchor" href="https://github.com/PenguineDavid/LFSR-random">#</a>
+                    lfsr_random
+                </h1>
+                <p class="section-tagline">Single-header C++17 PRNG library. Drop one file in, include it, done. No
+                    dependencies beyond the standard library.</p>
+
+                <!-- Installation -->
+                <div class="doc-section open">
+                    <button class="doc-section-toggle" aria-expanded="true">
+                        <h2>Installation</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>Copy <code>lfsr_random.hpp</code> into your project. Recommended layout:</p>
+                        <pre class="github-dark"><code>your_project/
+    include/
+        lfsr_random.hpp
+    src/
+        main.cpp</code></pre>
+                        <p>Include it with:</p>
+                        <pre
+                            class="github-dark"><code><span class="keyword">#include</span> <span class="string">"lfsr_random.hpp"</span></code></pre>
+                        <p>If you use the recommended layout, pass <code>-I include</code> to the compiler:</p>
+                        <pre class="github-dark"><code>g++ -std=c++17 -O2 -I include src/main.cpp -o myapp</code></pre>
+                        <p><strong>Requirements:</strong> C++17 or later. No third-party dependencies.</p>
+                    </div>
+                </div>
+
+                <!-- Backends -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Backends</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>Two engines run under the hood. The API routes to the right one based on the type you ask
+                            for.</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Engine</th>
+                                    <th>Class</th>
+                                    <th>State</th>
+                                    <th>Period</th>
+                                    <th>Used for</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fibonacci LFSR</td>
+                                    <td><code>lfsr_engine_32</code></td>
+                                    <td>32-bit</td>
+                                    <td>2^32 - 1</td>
+                                    <td><code>Int</code> <code>Uint</code> <code>Float</code> <code>Char</code>
+                                        <code>Bool</code></td>
+                                </tr>
+                                <tr>
+                                    <td>xoshiro256**</td>
+                                    <td><code>lfsr_engine_128</code></td>
+                                    <td>256-bit</td>
+                                    <td>2^256 - 1</td>
+                                    <td><code>Int64</code> <code>Uint64</code> <code>Double</code>, all distributions
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p>Both engines are held in <code>thread_local</code> storage. All calls are thread-safe with no
+                            mutex overhead. Each thread gets its own independently auto-seeded engine on first use.</p>
+                    </div>
+                </div>
+
+                <!-- Quick Start -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Quick Start</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <pre
+                            class="github-dark"><code><span class="keyword">#include</span> <span class="string">"lfsr_random.hpp"</span>
+
+<span class="type">int</span>   <span class="variable">n</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="number">100</span><span class="punctuation">)</span><span class="punctuation">;</span>       <span class="comment">// [0, 100] inclusive</span>
+<span class="type">float</span> <span class="variable">f</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Float.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0.f</span><span class="punctuation">,</span> <span class="number">1.f</span><span class="punctuation">)</span><span class="punctuation">;</span>   <span class="comment">// [0, 1)</span>
+<span class="type">bool</span>  <span class="variable">b</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Bool.<span class="function">uniform</span><span class="punctuation">()</span><span class="punctuation">;</span>            <span class="comment">// 50/50 coin flip</span>
+<span class="type">char</span>  <span class="variable">c</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Char.<span class="function">uniform</span><span class="punctuation">(</span><span class="string">'a'</span><span class="punctuation">,</span> <span class="string">'z'</span><span class="punctuation">)</span><span class="punctuation">;</span>   <span class="comment">// random lowercase letter</span>
+
+std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span><span class="type">int</span><span class="punctuation">&gt;</span> <span class="variable">v</span> <span class="operator">=</span> <span class="punctuation">{</span><span class="number">1</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">3</span><span class="punctuation">,</span> <span class="number">4</span><span class="punctuation">,</span> <span class="number">5</span><span class="punctuation">}</span><span class="punctuation">;</span>
+lfsr<span class="punctuation">::</span><span class="function">shuffle</span><span class="punctuation">(</span>v.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="keyword">auto</span> <span class="variable">it</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span><span class="function">sample</span><span class="punctuation">(</span>v.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>  <span class="comment">// iterator to a random element</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- API Reference -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>API Reference</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+
+                        <h3>lfsr::Int</h3>
+                        <p>Backed by the 32-bit LFSR engine.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">int</span> lfsr<span class="punctuation">::</span>Int.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">int</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">int</span> <span class="variable">max</span><span class="punctuation">)</span>
+<span class="type">int</span> lfsr<span class="punctuation">::</span>Int.<span class="function">sysTimeSeed</span><span class="punctuation">()</span></code></pre>
+                        <p>Returns a uniformly distributed <code>int</code> in <code>[min, max]</code> (both endpoints
+                            inclusive). If <code>min &gt;= max</code>, returns <code>min</code>.
+                            <code>sysTimeSeed()</code> returns the current RDTSC counter cast to a positive
+                            <code>int</code>.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">int</span> <span class="variable">d6</span>    <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">1</span><span class="punctuation">,</span> <span class="number">6</span><span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> vec.<span class="function">size</span><span class="punctuation">()</span> <span class="operator">-</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Uint</h3>
+                        <p>Backed by the 32-bit LFSR engine. Same semantics as <code>Int</code> but for
+                            <code>unsigned int</code>.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">unsigned int</span> lfsr<span class="punctuation">::</span>Uint.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">unsigned int</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">unsigned int</span> <span class="variable">max</span><span class="punctuation">)</span>
+<span class="type">unsigned int</span> lfsr<span class="punctuation">::</span>Uint.<span class="function">sysTimeSeed</span><span class="punctuation">()</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Int64</h3>
+                        <p>Backed by the xoshiro256** engine. Handles the full signed 64-bit range including ranges that
+                            span the sign boundary.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">int64_t</span> lfsr<span class="punctuation">::</span>Int64.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">int64_t</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">int64_t</span> <span class="variable">max</span><span class="punctuation">)</span>
+
+<span class="type">int64_t</span> <span class="variable">big</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int64.<span class="function">uniform</span><span class="punctuation">(</span>INT64_MIN<span class="punctuation">,</span> INT64_MAX<span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">int64_t</span> <span class="variable">ts</span>  <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int64.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="number">1'000'000'000LL</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Uint64</h3>
+                        <pre
+                            class="github-dark"><code><span class="type">uint64_t</span> lfsr<span class="punctuation">::</span>Uint64.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">uint64_t</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">uint64_t</span> <span class="variable">max</span><span class="punctuation">)</span>
+<span class="type">uint64_t</span> lfsr<span class="punctuation">::</span>Uint64.<span class="function">sysTimeSeed</span><span class="punctuation">()</span>
+
+<span class="type">uint64_t</span> <span class="variable">id</span>  <span class="operator">=</span> lfsr<span class="punctuation">::</span>Uint64.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span>ULL<span class="punctuation">,</span> UINT64_MAX<span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">uint64_t</span> <span class="variable">off</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Uint64.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span>ULL<span class="punctuation">,</span> file_size <span class="operator">-</span> <span class="number">1</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Float</h3>
+                        <p>Backed by the 32-bit LFSR engine. 24-bit mantissa precision. Upper bound is exclusive.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">float</span> lfsr<span class="punctuation">::</span>Float.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">float</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">float</span> <span class="variable">max</span><span class="punctuation">)</span>
+
+<span class="type">float</span> <span class="variable">t</span>     <span class="operator">=</span> lfsr<span class="punctuation">::</span>Float.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0.f</span><span class="punctuation">,</span> <span class="number">1.f</span><span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">float</span> <span class="variable">angle</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Float.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0.f</span><span class="punctuation">,</span> <span class="number">6.2831853f</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Double</h3>
+                        <p>Backed by the xoshiro256** engine. 53-bit mantissa precision.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">double</span> lfsr<span class="punctuation">::</span>Double.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">double</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">double</span> <span class="variable">max</span><span class="punctuation">)</span>
+<span class="type">double</span> lfsr<span class="punctuation">::</span>Double.<span class="function">normal</span><span class="punctuation">(</span><span class="type">double</span> <span class="variable">mean</span> <span class="operator">=</span> <span class="number">0.0</span><span class="punctuation">,</span> <span class="type">double</span> <span class="variable">stddev</span> <span class="operator">=</span> <span class="number">1.0</span><span class="punctuation">)</span>
+<span class="type">double</span> lfsr<span class="punctuation">::</span>Double.<span class="function">exponential</span><span class="punctuation">(</span><span class="type">double</span> <span class="variable">lambda</span> <span class="operator">=</span> <span class="number">1.0</span><span class="punctuation">)</span></code></pre>
+                        <p><code>normal()</code> uses a Box-Muller transform; the spare sample is cached per-thread so
+                            every two engine calls produce two output samples. <code>exponential()</code> has mean
+                            <code>1 / lambda</code>; lambda must be greater than zero.</p>
+                        <pre
+                            class="github-dark"><code><span class="type">double</span> <span class="variable">u</span>    <span class="operator">=</span> lfsr<span class="punctuation">::</span>Double.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0.0</span><span class="punctuation">,</span> <span class="number">1.0</span><span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">double</span> <span class="variable">roll</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Double.<span class="function">normal</span><span class="punctuation">(</span><span class="number">100.0</span><span class="punctuation">,</span> <span class="number">15.0</span><span class="punctuation">)</span><span class="punctuation">;</span>  <span class="comment">// IQ-style distribution</span>
+<span class="type">double</span> <span class="variable">wait</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Double.<span class="function">exponential</span><span class="punctuation">(</span><span class="number">2.0</span><span class="punctuation">)</span><span class="punctuation">;</span>     <span class="comment">// mean = 0.5</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Bool</h3>
+                        <pre
+                            class="github-dark"><code><span class="type">bool</span> lfsr<span class="punctuation">::</span>Bool.<span class="function">uniform</span><span class="punctuation">()</span>                    <span class="comment">// unbiased coin flip</span>
+<span class="type">bool</span> lfsr<span class="punctuation">::</span>Bool.<span class="function">bernoulli</span><span class="punctuation">(</span><span class="type">double</span> <span class="variable">p</span><span class="punctuation">)</span>          <span class="comment">// true with probability p</span>
+
+<span class="keyword">if</span> <span class="punctuation">(</span>lfsr<span class="punctuation">::</span>Bool.<span class="function">bernoulli</span><span class="punctuation">(</span><span class="number">0.05</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="function">trigger_rare_event</span><span class="punctuation">()</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::Char</h3>
+                        <pre
+                            class="github-dark"><code><span class="type">char</span> lfsr<span class="punctuation">::</span>Char.<span class="function">uniform</span><span class="punctuation">(</span><span class="type">char</span> <span class="variable">min</span><span class="punctuation">,</span> <span class="type">char</span> <span class="variable">max</span><span class="punctuation">)</span>
+
+<span class="type">char</span> <span class="variable">lower</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Char.<span class="function">uniform</span><span class="punctuation">(</span><span class="string">'a'</span><span class="punctuation">,</span> <span class="string">'z'</span><span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="type">char</span> <span class="variable">digit</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Char.<span class="function">uniform</span><span class="punctuation">(</span><span class="string">'0'</span><span class="punctuation">,</span> <span class="string">'9'</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::shuffle</h3>
+                        <p>Fisher-Yates in-place shuffle over <code>[first, last)</code>. Works on any
+                            <code>RandomAccessIterator</code>. Empty and single-element ranges are no-ops.</p>
+                        <pre
+                            class="github-dark"><code><span class="keyword">template</span> <span class="punctuation">&lt;</span><span class="keyword">typename</span> <span class="type">RandomIt</span><span class="punctuation">&gt;</span>
+<span class="type">void</span> lfsr<span class="punctuation">::</span><span class="function">shuffle</span><span class="punctuation">(</span><span class="type">RandomIt</span> <span class="variable">first</span><span class="punctuation">,</span> <span class="type">RandomIt</span> <span class="variable">last</span><span class="punctuation">)</span>
+
+std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span><span class="type">int</span><span class="punctuation">&gt;</span> <span class="variable">deck</span><span class="punctuation">(</span><span class="number">52</span><span class="punctuation">)</span><span class="punctuation">;</span>
+std<span class="punctuation">::</span><span class="function">iota</span><span class="punctuation">(</span>deck.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> deck.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">)</span><span class="punctuation">;</span>
+lfsr<span class="punctuation">::</span><span class="function">shuffle</span><span class="punctuation">(</span>deck.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> deck.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="type">int</span> <span class="variable">arr</span><span class="punctuation">[]</span> <span class="operator">=</span> <span class="punctuation">{</span><span class="number">1</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">3</span><span class="punctuation">,</span> <span class="number">4</span><span class="punctuation">,</span> <span class="number">5</span><span class="punctuation">}</span><span class="punctuation">;</span>
+lfsr<span class="punctuation">::</span><span class="function">shuffle</span><span class="punctuation">(</span>std<span class="punctuation">::</span><span class="function">begin</span><span class="punctuation">(</span><span class="variable">arr</span><span class="punctuation">)</span><span class="punctuation">,</span> std<span class="punctuation">::</span><span class="function">end</span><span class="punctuation">(</span><span class="variable">arr</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::sample</h3>
+                        <p>Returns an iterator to a uniformly random element in <code>[first, last)</code>. Returns
+                            <code>last</code> if the range is empty — always check before dereferencing.</p>
+                        <pre
+                            class="github-dark"><code><span class="keyword">template</span> <span class="punctuation">&lt;</span><span class="keyword">typename</span> <span class="type">RandomIt</span><span class="punctuation">&gt;</span>
+<span class="type">RandomIt</span> lfsr<span class="punctuation">::</span><span class="function">sample</span><span class="punctuation">(</span><span class="type">RandomIt</span> <span class="variable">first</span><span class="punctuation">,</span> <span class="type">RandomIt</span> <span class="variable">last</span><span class="punctuation">)</span>
+
+<span class="keyword">auto</span><span class="operator">&amp;</span> <span class="variable">winner</span> <span class="operator">=</span> <span class="operator">*</span>lfsr<span class="punctuation">::</span><span class="function">sample</span><span class="punctuation">(</span>players.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> players.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="keyword">auto</span> <span class="variable">it</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span><span class="function">sample</span><span class="punctuation">(</span>v.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+<span class="keyword">if</span> <span class="punctuation">(</span><span class="variable">it</span> <span class="operator">!=</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">)</span> <span class="function">use</span><span class="punctuation">(</span><span class="operator">*</span><span class="variable">it</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::weighted_pick</h3>
+                        <p>Picks a value from a table of <code>{value, weight}</code> pairs. Weights are relative and do
+                            not need to sum to 1. All weights must be non-negative with at least one greater than zero.
+                            Throws <code>std::invalid_argument</code> if the table is empty.</p>
+                        <pre class="github-dark"><code><span class="keyword">template</span> <span class="punctuation">&lt;</span><span class="keyword">typename</span> <span class="type">T</span><span class="punctuation">&gt;</span>
+<span class="type">T</span> lfsr<span class="punctuation">::</span><span class="function">weighted_pick</span><span class="punctuation">(</span><span class="keyword">const</span> std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span>std<span class="punctuation">::</span>pair<span class="punctuation">&lt;</span><span class="type">T</span><span class="punctuation">,</span> <span class="type">double</span><span class="punctuation">&gt;&gt;&amp;</span> <span class="variable">table</span><span class="punctuation">)</span>
+
+<span class="keyword">using</span> <span class="type">P</span> <span class="operator">=</span> std<span class="punctuation">::</span>pair<span class="punctuation">&lt;</span>std<span class="punctuation">::</span>string<span class="punctuation">,</span> <span class="type">double</span><span class="punctuation">&gt;</span><span class="punctuation">;</span>
+<span class="keyword">auto</span> <span class="variable">loot</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>weighted_pick<span class="punctuation">&lt;</span>std<span class="punctuation">::</span>string<span class="punctuation">&gt;</span><span class="punctuation">(</span><span class="punctuation">{</span>
+    <span class="type">P</span><span class="punctuation">{</span><span class="string">"common sword"</span><span class="punctuation">,</span>  <span class="number">70.0</span><span class="punctuation">}</span><span class="punctuation">,</span>
+    <span class="type">P</span><span class="punctuation">{</span><span class="string">"rare shield"</span><span class="punctuation">,</span>   <span class="number">25.0</span><span class="punctuation">}</span><span class="punctuation">,</span>
+    <span class="type">P</span><span class="punctuation">{</span><span class="string">"epic axe"</span><span class="punctuation">,</span>       <span class="number">4.5</span><span class="punctuation">}</span><span class="punctuation">,</span>
+    <span class="type">P</span><span class="punctuation">{</span><span class="string">"legendary bow"</span><span class="punctuation">,</span>  <span class="number">0.5</span><span class="punctuation">}</span><span class="punctuation">,</span>
+<span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+
+                        <hr>
+                        <h3>lfsr::weighted_index</h3>
+                        <p>Same as <code>weighted_pick</code> but returns the index into the weight vector rather than a
+                            value.</p>
+                        <pre
+                            class="github-dark"><code>std<span class="punctuation">::</span>size_t lfsr<span class="punctuation">::</span><span class="function">weighted_index</span><span class="punctuation">(</span><span class="keyword">const</span> std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span><span class="type">double</span><span class="punctuation">&gt;&amp;</span> <span class="variable">weights</span><span class="punctuation">)</span>
+
+std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span><span class="type">double</span><span class="punctuation">&gt;</span> <span class="variable">spawn_weights</span> <span class="operator">=</span> <span class="punctuation">{</span><span class="number">10.0</span><span class="punctuation">,</span> <span class="number">5.0</span><span class="punctuation">,</span> <span class="number">1.0</span><span class="punctuation">}</span><span class="punctuation">;</span>
+std<span class="punctuation">::</span>size_t <span class="variable">enemy_type</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span><span class="function">weighted_index</span><span class="punctuation">(</span><span class="variable">spawn_weights</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Seeding -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Seeding</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>Engines are auto-seeded from RDTSC (or <code>std::chrono::steady_clock</code> on non-x86)
+                            mixed with a stack address on first use. You only need to seed manually for reproducible
+                            output.</p>
+                        <pre
+                            class="github-dark"><code><span class="comment">// Seed the 32-bit engine (affects Int, Uint, Float, Char, Bool)</span>
+lfsr<span class="punctuation">::</span><span class="function">seed_32</span><span class="punctuation">(</span><span class="number">42u</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="comment">// Seed the 128-bit engine (affects Int64, Uint64, Double, distributions)</span>
+lfsr<span class="punctuation">::</span><span class="function">seed_128</span><span class="punctuation">(</span><span class="number">0xDEADBEEF</span>u<span class="punctuation">,</span> <span class="number">0xCAFEBABE</span>u<span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+                        <p>Seeding is per-thread. Calling <code>seed_32</code> on thread A does not affect thread B's
+                            engine.</p>
+                        <pre class="github-dark"><code><span class="type">int</span> <span class="function">main</span><span class="punctuation">()</span> <span class="punctuation">{</span>
+    lfsr<span class="punctuation">::</span><span class="function">seed_32</span><span class="punctuation">(</span><span class="number">12345u</span><span class="punctuation">)</span><span class="punctuation">;</span>
+    lfsr<span class="punctuation">::</span><span class="function">seed_128</span><span class="punctuation">(</span><span class="number">12345u</span><span class="punctuation">,</span> <span class="number">67890u</span><span class="punctuation">)</span><span class="punctuation">;</span>
+    <span class="comment">// all subsequent calls are deterministic on this thread</span>
+<span class="punctuation">}</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Raw Engine Access -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Raw Engine Access</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <pre
+                            class="github-dark"><code>lfsr_engine_32<span class="operator">&amp;</span>  <span class="variable">e32</span>  <span class="operator">=</span> lfsr<span class="punctuation">::</span><span class="function">engine32</span><span class="punctuation">()</span><span class="punctuation">;</span>
+lfsr_engine_128<span class="operator">&amp;</span> <span class="variable">e128</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span><span class="function">engine128</span><span class="punctuation">()</span><span class="punctuation">;</span>
+
+<span class="type">uint32_t</span> <span class="variable">raw32</span> <span class="operator">=</span> <span class="function">e32</span><span class="punctuation">()</span><span class="punctuation">;</span>
+<span class="type">uint64_t</span> <span class="variable">raw64</span> <span class="operator">=</span> <span class="function">e128</span><span class="punctuation">()</span><span class="punctuation">;</span>
+
+<span class="comment">// Both satisfy UniformRandomBitGenerator - work with std:: algorithms</span>
+std<span class="punctuation">::</span><span class="function">shuffle</span><span class="punctuation">(</span>v.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">,</span> lfsr<span class="punctuation">::</span><span class="function">engine32</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+std<span class="punctuation">::</span><span class="function">generate</span><span class="punctuation">(</span>v.<span class="function">begin</span><span class="punctuation">()</span><span class="punctuation">,</span> v.<span class="function">end</span><span class="punctuation">()</span><span class="punctuation">,</span> lfsr<span class="punctuation">::</span><span class="function">engine32</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="comment">// Local instances without touching thread_local state</span>
+lfsr_engine_32  <span class="variable">local32</span><span class="punctuation">(</span><span class="number">0xABCDu</span><span class="punctuation">)</span><span class="punctuation">;</span>
+lfsr_engine_128 <span class="variable">local128</span><span class="punctuation">(</span><span class="number">0x1234u</span><span class="punctuation">,</span> <span class="number">0x5678u</span><span class="punctuation">)</span><span class="punctuation">;</span>
+
+<span class="keyword">for</span> <span class="punctuation">(</span><span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">&lt;</span> <span class="number">100</span><span class="punctuation">;</span> <span class="operator">++</span><span class="variable">i</span><span class="punctuation">)</span>
+    <span class="function">process</span><span class="punctuation">(</span><span class="function">local32</span><span class="punctuation">()</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Thread Safety -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Thread Safety</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>Every thread has its own engine instances via <code>thread_local</code>. There are no shared
+                            mutable globals and no locks. Calls from different threads never interfere.</p>
+                        <pre class="github-dark"><code>std<span class="punctuation">::</span>vector<span class="punctuation">&lt;</span>std<span class="punctuation">::</span>thread<span class="punctuation">&gt;</span> <span class="variable">workers</span><span class="punctuation">;</span>
+<span class="keyword">for</span> <span class="punctuation">(</span><span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span><span class="punctuation">;</span> <span class="variable">i</span> <span class="operator">&lt;</span> <span class="number">8</span><span class="punctuation">;</span> <span class="operator">++</span><span class="variable">i</span><span class="punctuation">)</span>
+    workers.<span class="function">emplace_back</span><span class="punctuation">(</span><span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">()</span> <span class="punctuation">{</span>
+        <span class="type">int</span> <span class="variable">v</span> <span class="operator">=</span> lfsr<span class="punctuation">::</span>Int.<span class="function">uniform</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="number">100</span><span class="punctuation">)</span><span class="punctuation">;</span>  <span class="comment">// independent from all other threads</span>
+    <span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">;</span></code></pre>
+                        <p>Note that <code>seed_32</code> and <code>seed_128</code> only affect the calling thread's
+                            engine.</p>
+                    </div>
+                </div>
+
+                <!-- Compile and Test -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Compile and Test</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>The test suite is in <code>tests/test_lfsr_random.cpp</code>. From the project root:</p>
+                        <pre class="github-dark"><code>g++ -std=c++17 -O2 -Wall -Wextra -pthread -I include tests/test_lfsr_random.cpp -o test_lfsr
+./test_lfsr</code></pre>
+                        <p>Expected output ends with <code>52 / 52 tests passed.</code></p>
+                    </div>
+                </div>
+
+                <!-- Notes on Uniformity -->
+                <div class="doc-section">
+                    <button class="doc-section-toggle" aria-expanded="false">
+                        <h2>Notes on Uniformity</h2>
+                        <span class="doc-section-arrow">&#9660;</span>
+                    </button>
+                    <div class="doc-section-body">
+                        <p>All integer samplers use rejection sampling to eliminate modulo bias. The 32-bit sampler uses
+                            the Lemire fast-range method with a rejection loop; the 64-bit sampler mirrors the same
+                            approach. Floating-point outputs use the top 24 bits (float) or top 53 bits (double) of the
+                            raw engine output, mapping directly to the mantissa width of each type.</p>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <span class="footer-text">© 2026 David S. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="/js/nav.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Collapsible doc sections
+        document.querySelectorAll('.doc-section-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.closest('.doc-section');
+                const isOpen = section.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen);
+            });
+        });
+    </script>
+</body>
+
+</html>

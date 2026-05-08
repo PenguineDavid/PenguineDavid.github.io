@@ -1,0 +1,67 @@
+/* -- SKILLS GRID ------------------------------------------------------------
+   Two columns for Languages + Hardware side by side,
+   Tools & Platforms spans full width below.                               */
+.skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.skills-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(160, 120, 255, 0.15);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+}
+
+.skills-section--wide {
+    grid-column: 1 / -1;
+}
+
+.skills-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(160, 120, 255, 0.6);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(160, 120, 255, 0.12);
+    text-align: left;
+    /* override the global centred heading rule */
+}
+
+.badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.badge-group img {
+    height: 28px;
+    display: block;
+    border-radius: 4px;
+    opacity: 0.88;
+    transition: opacity 0.2s;
+}
+
+.badge-group img:hover {
+    opacity: 1;
+}
+
+/* -- NARROW (<560px): stack columns --------------------------------------- */
+@media (max-width: 560px) {
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skills-section--wide {
+        grid-column: 1;
+    }
+
+    .skills-section {
+        padding: 1rem 1.1rem;
+    }
+}
