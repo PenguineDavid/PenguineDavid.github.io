@@ -10,7 +10,7 @@ const SITEMAP = [
         path: '/',
         label: 'Home',
         parent: null,
-        children: ['/projects/', '/skills/', '/contact/']
+        children: ['/projects/', '/skills/', '/contact/', '/about/']
     },
     {
         path: '/projects/',
@@ -40,6 +40,12 @@ const SITEMAP = [
         path: '/projects/gallery/',
         label: 'Gallery',
         parent: '/projects/',
+        children: []
+    },
+    {
+        path: '/about/',
+        label: 'About',
+        parent: '/',
         children: []
     }
 ];
