@@ -65,3 +65,94 @@
         padding: 1rem 1.1rem;
     }
 }
+
+/* -- METRICS CHART INTERACTION STYLES -------------------------------------- */
+.gh-chart-section {
+    text-align: center;
+}
+
+#gh-chart-status {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    min-height: 1.2rem;
+}
+
+.gh-pie-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+.gh-pie-wrapper svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+/* Slices configuration */
+.slice-path {
+    cursor: pointer;
+    stroke: rgba(0, 0, 0, 0.6);
+    stroke-width: 1px;
+    stroke-linejoin: round;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), stroke-width 0.2s ease;
+}
+
+/* Hover dynamic pop */
+.slice-path.hovered {
+    stroke: #000000;
+    stroke-width: 3.5px;
+}
+
+/* Static background geometry ring */
+.outer-ring {
+    fill: none;
+    stroke: rgba(160, 120, 255, 0.25);
+    stroke-width: 2px;
+}
+
+/* Metadata UI Elements */
+.leader-line {
+    stroke: rgba(160, 120, 255, 0.4);
+    stroke-width: 1.5px;
+    fill: none;
+    pointer-events: none;
+}
+
+.node-dot {
+    fill: rgba(160, 120, 255, 0.7);
+    pointer-events: none;
+}
+
+.bubble-bg {
+    fill: rgba(20, 15, 35, 0.85);
+    stroke: rgba(160, 120, 255, 0.3);
+    stroke-width: 1px;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+
+.bubble-text {
+    font-size: 11px;
+    font-family: inherit;
+    fill: rgba(255, 255, 255, 0.85);
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+}
+
+/* Responsive adjustments matching existing sheet rules */
+@media (max-width: 560px) {
+    .gh-pie-wrapper {
+        max-width: 100%;
+    }
+
+    .bubble-text {
+        font-size: 10px;
+    }
+}
