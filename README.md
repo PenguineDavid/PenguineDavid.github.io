@@ -12,4 +12,4 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or  
 (at your option) any later version.
 
-See the [LICENSE](https://github.com/PenguineDavid/PenguineDavid.github.io/tree/main?tab=readme-ov-file) file for the full license text.
+See the [LICENSE](https://github.com/PenguineDavid/penguinedavid.github.io?tab=GPL-3.0-1-ov-file) file for the full license text.
