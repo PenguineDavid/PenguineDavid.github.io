@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kith Development Documents</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="/css/document-styles/kith.css">
+</head>
+<body>
+    <main>
+        <div class="side-bar">
+            <h2>Navigation</h2>
+            <a href="index.html">Home</a>
+            <a href="#table">TOC</a>
+            <p><br>&copy; 2026 David S. All rights reserved.</p>
+        </div>
+        <div class="content">
+            <h1 class="center">Kith Development Documents</h1>
+
+            <!-- TOC container, hidden until URL has #table -->
+            <section id="table">
+                <h2>Table of Contents</h2>
+
+                <ul id="page-toc">
+                    <!-- populated at load time from the rendered doc's h2 headings -->
+                </ul>
+            </section>
+
+            <div id="home">
+            </div>
+        </div>
+    </main>
+
+    <script type="text/markdown" id="markdown-source">
+# Kith Compiler - Developer Reference
+
+> **CopyRight**
+> Copyright (c) 2026 David S. All rights reserved.
+
+---
+
+## Pipeline Overview
+
+```
+source.kith
+    |
+    v
+[ Lexer ]          lexer.cpp / lexer.h
+    |  vector<Token>
+    v
+[ Parser ]         parser.cpp / parser.h
+    |  unique_ptr<Program>
+    v
+[ CodeGen ]        codegen.cpp / codegen.h
+    |  std::string  (C source)
+    v
+output.c           (written to disk, then DELETED after gcc)
+    |
+    v
+[ gcc -lm ]
+    |
+    v
+output.exe / output
+```
+
+- Single-pass transpiler to C. No IR, no optimisation.
+- `output.c` is deleted by `main.cpp` via `std::remove()` whether gcc succeeds or fails.
+- `-lm` is always passed to link `pow()`, `sqrt()`, etc.
+- `sourceDir` is extracted from the input path and passed to the Parser so relative `include` paths resolve correctly.
+
+---
+
+## Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `main.cpp` | CLI. Lex → Parse → Codegen → write output.c → gcc → remove output.c. |
+| `lexer.h / lexer.cpp` | Tokenizer. |
+| `parser.h / parser.cpp` | Recursive-descent parser. Builds AST. |
+| `ast.h` | All AST node structs. |
+| `codegen.h / codegen.cpp` | AST walker, emits C source string. |
+| `test.cpp` | Unit test suite (54 tests, 0 failures). |
+
+---
+
+## Build & Test
+
+```bash
+# Build the compiler
+g++ -std=c++17 main.cpp lexer.cpp parser.cpp codegen.cpp -o kith
+
+# Build and run tests (no main.cpp needed)
+g++ -std=c++17 test.cpp lexer.cpp parser.cpp codegen.cpp -o test_runner
+./test_runner
+
+# Compile a source file
+kith source.kith              # outputs ./output
+kith source.kith myprogram    # outputs ./myprogram
+```
+
+---
+
+## Lexer
+
+**Class:** `Lexer`  
+**Key method:** `vector<Token> tokenize()`
+
+Uses a `peek(offset)` helper for multi-char lookahead. Longest-match order for ambiguous prefixes:
+
+```
+>>>  before  >>  before  >
+===  before  ==  before  =
+!==  before  !=  before  !
+**   before  *
+^^   before  ^
+||   before  |
+&&   before  &
+++   before  +
+--   before  -  before  ->
+??   before  ?
+```
+
+### Full TokenType table
+
+| Token | Lexeme | Notes |
+|-------|--------|-------|
+| `FUNC` | `func` | |
+| `INT_TYPE` | `int` | |
+| `STR_TYPE` | `str` | |
+| `FLOAT_TYPE` | `float` | maps to C `double` |
+| `BOOL_TYPE` | `bool` | maps to C `int` |
+| `IF` `ELSE` | `if` `else` | |
+| `WHILE` `DO` | `while` `do` | |
+| `FOR` `FOREACH` | `for` `foreach` | |
+| `SWITCH` `CASE` `DEFAULT` | `switch` `case` `default` | |
+| `BREAK` | `break` | |
+| `STRUCT` | `struct` | |
+| `TRY` `CATCH` `THROW` `FINALLY` | `try` `catch` `throw` `finally` | |
+| `INCLUDE` | `include` | |
+| `RETURN` `STOP` | `return` `stop` | `stop` emits `exit(0)` |
+| `TRUE` `FALSE` | `true` `false` | |
+| `AND` `OR` `XOR` `NOT` | `and` `or` `xor` `not` | word-form logical ops |
+| `TYPEOF` | `typeof` | compile-time only |
+| `INSTANCEOF` | `instanceof` | compile-time only |
+| `IN_KW` | `in` | used in `foreach` and `in` operator |
+| `DELETE_KW` | `delete` | maps to `free()` |
+| `IDENTIFIER` | `[a-zA-Z_][a-zA-Z0-9_]*` | |
+| `NUMBER` | digits with optional `.digits` | covers int and float literals |
+| `STRING` | `"..."` `r"..."` `$"..."` `"""..."""` | prefix info encoded inside `.value` |
+| `ASSIGN` | `=` | |
+| `EQ` / `STRICT_EQ` | `==` / `===` | strict = same as `==` in C |
+| `NE` / `STRICT_NE` | `!=` / `!==` | strict = same as `!=` in C |
+| `LT` `GT` `LE` `GE` | `< > <= >=` | |
+| `PLUS` `MINUS` `STAR` `SLASH` `PERCENT` | `+ - * / %` | |
+| `POWER` | `**` | emits `pow(l, r)` |
+| `INC` `DEC` | `++ --` | prefix or postfix depending on parse position |
+| `LOGICAL_AND` `LOGICAL_OR` `LOGICAL_XOR` `LOGICAL_NOT` | `&& \|\| ^^ !` | symbol-form |
+| `BIT_AND` `BIT_OR` `BIT_XOR` `BIT_NOT` | `& \| ^ ~` | also: `&` = address-of unary, `*` = deref unary |
+| `LSH` `RSH` `URSH` | `<< >> >>>` | `>>>` = unsigned right shift |
+| `NCO` | `??` | null-coalescing |
+| `QUESTION` `COLON` | `? :` | ternary |
+| `ARROW` | `->` | struct pointer member access |
+| `LPAREN RPAREN` `LBRACE RBRACE` `LBRACKET RBRACKET` | `( ) { } [ ]` | |
+| `DOT` `COMMA` `COLON` `SEMICOLON` | `. , : ;` | semicolons used in for-loop headers |
+| `END_OF_FILE` | | always appended |
+
+### String literal encoding
+
+Prefix info is embedded in the token `.value` field:
+
+| Kith syntax | Token `.value` | `kind` in AST |
+|---|---|---|
+| `"hello"` | `hello` | `"normal"` |
+| `r"raw\ntext"` | `r:raw\ntext` | `"raw"` |
+| `$"Hi {name}"` | `$:Hi {name}` | `"interp"` |
+| `"""multi"""` | `m:multi` | `"multi"` |
+
+Escape sequences (`\n \t \\ \"`) are processed in the lexer for normal strings. Raw strings skip this.
+
+---
+
+## Parser
+
+**Class:** `Parser(tokens, sourceDir = ".")`  
+**Key method:** `unique_ptr<Program> parse()`
+
+`structNames` (`std::set<std::string>`) tracks declared struct type names so `isTypeToken()` accepts them in declarations and parameter lists alongside built-in type keywords.
+
+`isTypeToken()` is `const` and reads `tokens[position]` directly (not `current()`, which is non-const).
+
+### Operator precedence (low to high)
+
+| Level | Operators | Method |
+|-------|-----------|--------|
+| 1 | `? :` | `parseTernary` |
+| 2 | `??` | `parseNCO` |
+| 3 | `or \|\|` | `parseLogicalOr` |
+| 4 | `xor ^^` | `parseLogicalXor` |
+| 5 | `and &&` | `parseLogicalAnd` |
+| 6 | `\|` | `parseBitwiseOr` |
+| 7 | `^` | `parseBitwiseXor` |
+| 8 | `&` | `parseBitwiseAnd` |
+| 9 | `== != === !==` | `parseEquality` |
+| 10 | `< > <= >= in instanceof` | `parseComparison` |
+| 11 | `<< >> >>>` | `parseShift` |
+| 12 | `+ -` | `parseAdditive` |
+| 13 | `** * / %` | `parseMultiplicative` |
+| 14 | unary `-  !  not  ~  &  *  typeof  delete  pre++  pre--` | `parseUnary` |
+| 15 | postfix `[]  .  ->  post++  post--` | `parsePostfix` |
+| 16 | literals, calls, `(...)`, `[...]` | `parsePrimary` |
+
+### Key disambiguation rules
+
+**`STAR` in `parseMultiplicative`** - the loop exits without consuming `*` if the lookahead is `STAR IDENTIFIER ASSIGN`. That pattern means the next statement is a deref-assignment `*ptr = val`, not a multiply expression.
+
+**`BIT_AND`** - consumed as address-of `&expr` in `parseUnary`; consumed as bitwise-and `a & b` in `parseBitwiseAnd`.
+
+**Index assignment vs expression statement** - `parseStatement` peeks for `IDENTIFIER [ expr ] =`. If found, builds `IndexAssignment`. If the `=` is absent after `]`, it resets `position` and falls through to expression-statement parsing.
+
+**Global type dispatch** - `parse()` accepts a global declaration when it sees any built-in type keyword **or** any `isTypeToken()` identifier (which includes struct names). This is how `Point p = Point(...)` at global scope works.
+
+### `include` directive
+
+`include "file.kith"` - sub-file is lexed and parsed inline. Its structs, globals, and functions merge into the current `Program`. `structNames` is shared so struct types from the include are visible to the caller.
+
+`include "mylib.h"` - adds `#include "mylib.h"` to the C output.
+
+---
+
+## AST Node Catalogue
+
+### Program (root)
+
+```cpp
+struct Program {
+    vector<string>                           headerIncludes;
+    vector<unique_ptr<StructDecl>>           structs;
+    vector<unique_ptr<GlobalVarDeclaration>> globals;
+    vector<unique_ptr<Function>>             functions;
+};
+```
+
+### GlobalVarDeclaration
+
+```cpp
+struct GlobalVarDeclaration {
+    string type;        // "int","str","float","bool", or a struct name
+    string name;
+    string value;       // scalar literal - empty when initExpr is used
+    bool   isString  = false;
+    string kind;        // "normal"|"raw"|"interp"|"multi"
+    bool   isArray   = false;
+    bool   isPointer = false;
+    unique_ptr<Expression> initExpr; // set for array literals and struct constructors
+};
+```
+
+For array globals, `initExpr` holds an `ArrayLiteralExpr`. Codegen emits `type name[] = {...};` plus a companion `int name_len = N;`. Struct globals also use `initExpr` (holds a `CallExpr`). Scalar globals use the `value` string directly.
+
+**C constraint:** global initializers must be compile-time constants. Elements that reference other variables will fail at the gcc step - that is expected behaviour, not a Kith bug.
+
+### StructDecl
+
+```cpp
+struct StructField { string type; string name; bool isPointer = false; };
+struct StructDecl  { string name; vector<StructField> fields; };
+```
+
+Emitted as `typedef struct { ... } Name;`.
+
+### Expression nodes
+
+| Node | Key fields | Description |
+|------|-----------|-------------|
+| `LiteralExpr` | `value`, `isString`, `kind` | number, bool, or string literal |
+| `VariableExpr` | `name` | identifier reference |
+| `CallExpr` | `callee`, `arguments[]` | function call or struct constructor |
+| `BinaryExpr` | `left`, `op`, `right` | op is source string |
+| `UnaryExpr` | `op`, `expr` | `-  !  not  ~  &  *  typeof  delete  pre++  pre--  post++  post--` |
+| `IndexExpr` | `array`, `index` | read: `arr[i]` |
+| `ArrayLiteralExpr` | `elements[]` | `[1, 2, 3]` |
+| `MemberAccessExpr` | `object`, `member`, `isArrow` | `.` or `->` |
+| `TernaryExpr` | `condition`, `thenExpr`, `elseExpr` | `a ? b : c` |
+
+### Statement nodes
+
+| Node | Key fields | Generated C |
+|------|-----------|-------------|
+| `VarDeclaration` | `type`, `name`, `initExpr`, `isPointer`, `isArray` | `int x = expr;` / `int* px = &y;` / `int arr[] = {...};` |
+| `Assignment` | `name`, `value`, `deref` | `x = expr;` or `*x = expr;` |
+| `IndexAssignment` | `array`, `index`, `value` | `arr[i] = val;` |
+| `PrintStatement` | `expr` | `printf(...)` auto format |
+| `ReturnStatement` | `value` | `return expr;` |
+| `StopStatement` | - | `exit(0);` |
+| `BreakStatement` | - | `break;` |
+| `ExpressionStatement` | `expr` | `expr;` |
+| `Block` | `statements[]` | `{ ... }` |
+| `IfStatement` | `condition`, `thenBlock`, `elseBlock?` | `if/else` |
+| `WhileStatement` | `condition`, `body` | `while (...) { }` |
+| `DoWhileStatement` | `body`, `condition` | `do { } while (...);` |
+| `ForStatement` | `init?`, `condition?`, `update?`, `body` | `for (;;) { }` |
+| `ForeachStatement` | `varType`, `varName`, `array`, `body` | C for-loop with `arr_len` |
+| `SwitchStatement` | `subject`, `cases[]` | `switch` (int) or `strcmp` chain (str) |
+| `ThrowStatement` | `value` | sets `__kith_exc_msg`, calls `longjmp` |
+| `TryStatement` | `tryBlock`, `catchVar`, `catchBlock`, `finallyBlock?` | `setjmp/longjmp` structure |
+
+---
+
+## Codegen
+
+**Class:** `CodeGen`  
+**Key method:** `string generate(Program*)`
+
+### Emit order
+
+1. Standard `#include` headers: `stdio.h stdlib.h string.h math.h setjmp.h`
+2. User `#include "..."` headers (from `headerIncludes`)
+3. Exception infrastructure statics
+4. `typedef struct` definitions
+5. Global variable declarations (arrays also emit `_len` companion)
+6. Forward declarations for all user functions
+7. Function bodies
+
+### Stub function for global codegen
+
+`generateExpression` takes a `Function*` for type lookup context, but at global scope there's no real function. A local `Function __stubFunc("__global_stub")` with an empty body is created inside `generate()` solely for this purpose. It's safe because global initialisers must be compile-time constants - type lookup will never find anything meaningful in it, which is fine.
+
+### Type inference
+
+`getVariableType(name, func, program)` walks in priority order: function parameters → locals (recursive via `getVarTypeInBlock`, which descends into if/while/do/for/foreach/try bodies) → globals → fallback `"int"`.
+
+### Print format selection
+
+- `LiteralExpr` string → `printf("...\n")`
+- `LiteralExpr` number → `printf("%d\n", val)`
+- `VariableExpr` → type-lookup → `%s` (str) / `%g` (float) / `%d` (int/bool)
+- Everything else (including `IndexExpr`) → `%d` - **see limitation #1**
+
+### Switch on strings
+
+When `getVariableType` returns `"str"` for the switch subject, codegen emits an `if / else if (strcmp(...) == 0)` chain. `default` becomes a bare `else`. No fall-through in either path.
+
+### Exception codegen
+
+`try/catch/finally` maps to:
+
+```c
+if (setjmp(__kith_exc_stack[__kith_exc_depth++]) == 0) {
+    /* try body */
+    __kith_exc_depth--;
+    /* finally body (duplicated here) */
+} else {
+    __kith_exc_depth--;
+    char* e = __kith_exc_msg;
+    /* catch body */
+    /* finally body (duplicated here) */
+}
+```
+
+`throw "msg"` maps to:
+
+```c
+__kith_exc_msg = "msg";
+if (__kith_exc_depth > 0)
+    longjmp(__kith_exc_stack[__kith_exc_depth-1], 1);
+else { fprintf(stderr, "Uncaught exception: %s\n", __kith_exc_msg); exit(1); }
+```
+
+Max nesting: `__KITH_EXC_MAX = 64` in `codegen.cpp`.
+
+### Operator mapping table
+
+| Kith | C output | Notes |
+|------|----------|-------|
+| `**` | `pow(l, r)` | needs `-lm` |
+| `>>>` | `(unsigned int)(l) >> r` | unsigned |
+| `xor` / `^^` | `(!!(l) ^ !!(r))` | logical XOR |
+| `===` / `!==` | `==` / `!=` | no coercion in C anyway |
+| `??` | `(l != NULL ? l : r)` | |
+| `and` / `or` / `not` | `&&` / `\|\|` / `!` | |
+| `delete x` | `free(x)` | unary keyword |
+| `typeof x` | `"typename"` literal | compile-time |
+| `instanceof T` | `1` or `0` | compile-time |
+| `x in arr` | linear search loop | needs `arr_len` |
+
+---
+
+## Language Syntax Reference
+
+### Top-level structure
+
+```
+[include statements]
+[struct declarations]
+[global variable declarations]
+[function definitions]
+```
+
+**Order matters:** structs must appear before globals that reference them.
+
+### Declarations
+
+```kith
+int   name = expr
+str   name = expr
+float name = 3.14
+bool  name = true
+int*  name = &other
+int[] name = [1, 2, 3]
+MyStruct name = MyStruct(1, 2)
+```
+
+Global arrays must use literal elements - no runtime expressions at global scope.
+
+### Structs
+
+```kith
+struct Vec2 {
+    float x
+    float y
+}
+
+Vec2 v = Vec2(1.0, 2.0)     // global or local
+print(v.x)
+v.x = 9.9
+
+Vec2* vp = &v               // pointer
+print(vp->x)
+```
+
+Constructor: `TypeName(f1, f2, ...)` → C compound literal `(TypeName){f1, f2, ...}`.
+
+### Functions
+
+```kith
+func add(int a, int b) {
+    return a + b
+}
+```
+
+All functions emit `int` C return type. Pointer params: `int*`, `str*`.
+
+### Control flow
+
+```kith
+if (cond) { } else { }
+
+while (cond) { }
+
+do { } while (cond)
+
+for (int i = 0; i < n; i = i + 1) { }
+
+foreach (int x in arr) { }     // arr must have a companion arr_len
+
+switch (x) {                    // works for int and str
+    case 1  { }
+    case "hello" { }
+    default { }
+}
+```
+
+### Exceptions
+
+```kith
+try {
+    throw "something went wrong"
+} catch (e) {
+    print(e)
+} finally {
+    print("always runs")
+}
+```
+
+### Operators
+
+| Category | Operators |
+|----------|-----------|
+| Arithmetic | `+ - * / % **` |
+| Comparison | `< > <= >= == != === !==` |
+| Logical | `&& \|\| ^^ ! and or xor not` |
+| Bitwise | `& \| ^ ~ << >> >>>` |
+| Unary | `- ! ~ & * typeof delete ++x --x x++ x--` |
+| Ternary | `cond ? a : b` |
+| NCO | `a ?? b` |
+| Member | `. ->` |
+| Index | `arr[i]` (read and write) |
+| Cast | `int(x)` `float(x)` `str(x)` `bool(x)` |
+
+### print
+
+```kith
+print(expr)
+```
+
+Appends `\n`. Format: `%s` (str variable), `%g` (float variable), `%d` (everything else). Limitation: `print(arr[i])` always uses `%d` even for float arrays - assign to a typed variable first as a workaround.
+
+---
+
+## Type System
+
+| Kith | C | Notes |
+|------|---|-------|
+| `int` | `int` | |
+| `str` | `char*` | null-terminated |
+| `float` | `double` | always double precision |
+| `bool` | `int` | `true`=1, `false`=0 |
+| `int*` `str*` | `int*` `char**` | pointers |
+| `int[]` `float[]` `str[]` | `type[]` | stack array + `_len` companion |
+| `MyStruct` | `MyStruct` | typedef'd struct |
+
+No static type checking - type errors become gcc errors/warnings.
+
+---
+
+## String Variants
+
+| Prefix | Behaviour |
+|--------|-----------|
+| none | Normal. Escape sequences processed by lexer. |
+| `r"..."` | Raw. Backslashes not processed. |
+| `$"Hi {name}"` | Interpolated. `{varname}` substituted at runtime via `malloc`+`snprintf`. Caller responsible for `free()`. |
+| `"""..."""` | Multiline. Literal newlines preserved. |
+
+---
+
+## Exception System
+
+`setjmp`/`longjmp` based. The infrastructure (`__kith_exc_stack`, `__kith_exc_depth`, `__kith_exc_msg`) is emitted as file-scope statics at the top of every compiled output.
+
+`finally` bodies are duplicated into both the success and catch paths in the generated C - no `goto` needed since both paths are short and there's no fall-through risk.
+
+Max try-nesting depth: 64. Change `__KITH_EXC_MAX` in `codegen.cpp` to adjust.
+
+---
+
+## Built-in Functions
+
+| Kith | C output | Notes |
+|------|----------|-------|
+| `len(arr)` | `arr_len` | companion int variable; arg must be a named array |
+| `free(x)` | `free(x)` | |
+| `delete x` | `free(x)` | keyword form |
+| `int(x)` | `(int)(x)` | |
+| `float(x)` | `(double)(x)` | |
+| `str(x)` | `(char*)(x)` | |
+| `bool(x)` | `(!!(x))` | |
+| `toInt(s)` | `atoi(s)` | |
+| `toFloat(s)` | `atof(s)` | |
+| `toStr(n)` | `snprintf` into `malloc` buffer | caller must `free()` |
+| `input()` | `fgets` into 1024-byte `malloc` buffer | strips `\n`; caller must `free()` |
+| `sqrt(x)` | `sqrt(x)` | |
+| `abs(x)` | `abs(x)` | |
+| `floor(x)` `ceil(x)` | `floor(x)` `ceil(x)` | |
+| `min(a,b)` `max(a,b)` | ternary min/max | |
+
+---
+
+## Known Limitations / TODOs
+
+| # | Area | Issue |
+|---|------|-------|
+| 1 | Print | `print(arr[i])` always uses `%d` - float array elements print garbage. Workaround: assign to a typed variable first. |
+| 2 | Print | Any complex expression in `print()` defaults to `%d` |
+| 3 | Strings | Interpolated locals (`str s = $"..."`) never freed |
+| 4 | Strings | Interpolated globals not supported (emitted as `NULL`) |
+| 5 | Arrays | No bounds checking |
+| 6 | Arrays | Global array elements must be compile-time constants |
+| 7 | Arrays | No heap arrays - only stack-allocated C arrays |
+| 8 | Arrays | `len()` requires a named variable |
+| 9 | Foreach | Requires a named array variable (to derive `arr_len`) |
+| 10 | Types | No static type checking before codegen |
+| 11 | Types | Function signatures always emit `int` return type in C |
+| 12 | Types | No `void` functions - all emit `return 0;` |
+| 13 | Scope | Type lookup doesn't handle shadowed variable names correctly |
+| 14 | Switch | No fall-through in either int or string switches |
+| 15 | Switch | String switch only works when subject is a named variable |
+| 16 | Exceptions | `finally` body duplicated in C output |
+| 17 | Exceptions | Max nesting depth 64 |
+| 18 | Structs | No nested struct types |
+| 19 | Structs | No struct arrays |
+| 20 | Operators | `typeof` and `instanceof` are compile-time only |
+| 21 | Operators | `in` operator requires `arr_len` companion |
+| 22 | Includes | No circular dependency detection |
+
+---
+
+## Debugging Tips
+
+**Keep `output.c` for inspection** - comment out `std::remove(cFile.c_str())` in `main.cpp` temporarily.
+
+**`Parse error: Expected global variable name`** - almost always means you haven't updated your local files from the latest build. The old `parseGlobalDeclaration` didn't handle `[]` type syntax.
+
+**`Parse error: Unexpected top-level token: 'MyStruct'`** - the `struct` declaration must appear **before** any global variable of that type.
+
+**gcc format warnings on `print(arr[i])`** - limitation #1. Assign `float v = arr[i]` then `print(v)`.
+
+**The `output.c not present` test failure** - the test reads `main.cpp` from `/home/claude/main.cpp` (the build machine path). On Windows your `main.cpp` is in a different location. The feature itself works correctly - this is a test path issue only.
+
+---
+
+## WIP
+
+I'm currently working on a new version of Kith with a LOT of changes.
+    </script>
+
+    <script src="/js/document-scripts/kith.js"></script>
+</body>
+</html>

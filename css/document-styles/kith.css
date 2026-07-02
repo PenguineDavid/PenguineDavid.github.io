@@ -1,0 +1,346 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+}
+
+/* Fixed sidebar – card style with green left border */
+.side-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #2d2d2d;
+    border-left: 4px solid #2e7d32;
+    padding: 30px 20px;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+}
+
+.side-bar h2 {
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.side-bar a {
+    display: block;
+    padding: 12px 18px;
+    margin-bottom: 12px;
+    background: #3a3a3a;
+    color: #ddd;
+    text-decoration: none;
+    border-radius: 40px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    border-left: 2px solid transparent;
+}
+
+.side-bar a:hover {
+    background: #2e7d32;
+    color: white;
+    transform: translateX(6px);
+    border-left-color: #8bc34a;
+}
+
+/* Main content – pushed right of sidebar */
+.content {
+    margin-left: 280px;
+    padding: 40px 30px;
+    max-width: 1200px;
+}
+
+/* Both home and TOC sections get one flat lighter background, no card box */
+#home,
+#table {
+    background: #3a3a3a;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Home is visible by default, TOC hidden */
+#home {
+    display: block;
+}
+
+#table {
+    display: none;
+}
+
+/* When URL has #table, show TOC and hide home */
+#table:target {
+    display: block;
+}
+
+#table:target~#home {
+    display: none;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+    margin: 1.4em 0 0.5em;
+    font-weight: 400;
+}
+
+h1 {
+    border-bottom: 2px solid #2e7d32;
+    padding-bottom: 12px;
+    margin-top: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #444;
+    margin: 30px 0;
+}
+
+/* Markdown content */
+p, li, blockquote {
+    line-height: 1.6;
+    color: #ddd;
+}
+
+p {
+    margin: 0.8em 0;
+}
+
+ul, ol {
+    margin: 0.8em 0;
+    padding-left: 1.6em;
+}
+
+a {
+    color: #8bc34a;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #a5d6a5;
+}
+
+code {
+    background: #1e1e1e;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    color: #d4d4d4;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+pre code {
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+li > ul, li > ol {
+    margin-top: 6px;
+}
+
+pre {
+    background: #1e1e1e;
+    padding: 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 20px 0;
+    border: 1px solid #444;
+}
+
+blockquote {
+    border-left: 4px solid #2e7d32;
+    background: #252525;
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+/* Themed scrollbar for the main page (vertical, whole-document scroll) */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a #1a1a1a;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 5px;
+    border: 2px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+/* Themed scrollbars for tables and code blocks */
+table, pre {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a #2d2d2d;
+}
+
+table::-webkit-scrollbar,
+pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+table::-webkit-scrollbar-track,
+pre::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+table::-webkit-scrollbar-thumb,
+pre::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+table::-webkit-scrollbar-thumb:hover,
+pre::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #2d2d2d;
+    border: 1px solid #555;
+    margin: 20px 0;
+    display: block;
+    overflow-x: auto;
+}
+
+table th, table td {
+    border: 1px solid #555;
+    padding: 8px 12px;
+    color: #eee;
+    white-space: nowrap;
+    text-align: left;
+}
+
+table th {
+    background: #1e1e1e;
+    color: white;
+}
+
+/* Responsive: on narrow screens, sidebar becomes top bar */
+@media (max-width: 768px) {
+    .side-bar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 4px solid #2e7d32;
+        padding: 20px;
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .side-bar a {
+        display: inline-block;
+        margin-right: 12px;
+    }
+}
+
+.center {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* GitHub Dark theme wrapper */
+.github-dark {
+    background-color: #1e1e1e; 
+    color: #c9d1d9;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+    padding: 1rem;
+    border-radius: 6px;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.github-dark pre,
+.github-dark code {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+.github-dark pre code {
+    display: block;
+    white-space: pre !important;
+    overflow-x: auto;
+}
+
+.github-dark pre {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Prism's real token class names mapped to theme colors */
+.github-dark .token.comment {
+    color: #8b949e;
+    font-style: italic;
+}
+
+.github-dark .token.string {
+    color: #a5d6ff;
+}
+
+.github-dark .token.keyword {
+    color: #ff7b72;
+}
+
+.github-dark .token.function {
+    color: #d2a8ff;
+}
+
+.github-dark .token.number,
+.github-dark .token.boolean {
+    color: #79c0ff;
+}
+
+.github-dark .token.operator {
+    color: #ff7b72;
+}
+
+.github-dark .token.punctuation {
+    color: #c9d1d9;
+}
+
+.github-dark .token.tag {
+    color: #7ee787;
+}
+
+.github-dark .token.attr-name,
+.github-dark .token.variable {
+    color: #ffa657;
+}
