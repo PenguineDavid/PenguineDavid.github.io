@@ -19,12 +19,15 @@
             margin-bottom: 20px;
             border-radius: 8px;
             border: 1px solid #333;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         #spreadsheet .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
         #spreadsheet input,
@@ -85,12 +88,14 @@
             max-height: 70vh;
             overflow: auto;
             border: 1px solid #333;
+            max-width: 100%;
         }
 
         #spreadsheet .cpu-list {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
+            margin-bottom: 12px;
         }
 
         #spreadsheet .cpu-item {
@@ -102,11 +107,23 @@
             margin-left: 6px
         }
 
+        .signal-add-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        #newCpuName {
+            min-width: 280px;
+        }
+
         #spreadsheet input.text {
             width: 100%;
             border: none;
             background: #111;
             color: #0ff;
+            box-sizing: border-box;
         }
 
         #spreadsheet .merged-selected {
@@ -129,6 +146,8 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #333;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         #boolean-tool .wrap {
@@ -160,7 +179,8 @@
             padding: 12px;
             font-size: 15px;
             border-radius: 6px;
-            resize: vertical
+            resize: vertical;
+            box-sizing: border-box;
         }
 
         #boolean-tool button {
@@ -185,12 +205,19 @@
             gap: 16px
         }
 
+        @media (max-width: 900px) {
+            #boolean-tool .panels {
+                grid-template-columns: 1fr;
+            }
+        }
+
         #boolean-tool .panel {
             background: #0b0b0b;
             border: 1px solid #222;
             padding: 12px;
             border-radius: 8px;
-            overflow: auto
+            overflow: auto;
+            max-width: 100%;
         }
 
         #boolean-tool .small {
@@ -241,7 +268,9 @@
             display: inline-block;
             background: #0b0b0b;
             padding: 8px;
-            border-radius: 6px
+            border-radius: 6px;
+            max-width: 100%;
+            overflow-x: auto;
         }
 
         #boolean-tool .kmap-table td {
@@ -369,17 +398,17 @@
         /* Main Content Wrapper */
         #content-wrapper {
             margin-left: 260px;
-            /* Same as sidebar width */
             padding: 20px;
             min-height: 100vh;
             background: #000000;
+            overflow-x: hidden;
         }
 
         /* Existing sections styling adjustment */
         #spreadsheet,
         #boolean-tool {
             margin-bottom: 30px;
-            max-width: calc(100% - 40px);
+            max-width: 100%;
         }
 
         /* Scrollbar styling for sidebar */
@@ -487,14 +516,10 @@
             <div class="controls" id="controls">
                 <label>Opcode bits
                     <div>
-                        <button onclick="changeOpcodeBits(-1)">-1</button>
-                        <input type="number" id="opcodeBits" value="4" min="1">
-                        <button onclick="changeOpcodeBits(1)">+1</button>
+                        <button onclick="changeOpcodeBits(-1)">÷2</button>
+                        <input id="opcodeBits" value="4" readonly>
+                        <button onclick="changeOpcodeBits(1)">×2</button>
                     </div>
-                </label>
-
-                <label>Instruction count
-                    <input type="number" id="instructionCount" min="2">
                 </label>
 
                 <label>Register bits
@@ -505,7 +530,7 @@
             <h3>CPU Control Signals</h3>
             <div class="cpu-list" id="cpuList"></div>
 
-            <div>
+            <div class="signal-add-container">
                 <input id="newCpuName" placeholder="New signal name (e.g. CIN)">
                 <button onclick="addCpuSignal()">Add CPU Signal</button>
             </div>
@@ -542,7 +567,7 @@
                         <div id="simplified" class="simplified small">—</div>
 
                         <strong style="display:block;margin-top:12px">Truth table</strong>
-                        <div id="table"></div>
+                        <div id="table" style="overflow-x: auto;"></div>
                     </div>
 
                     <div class="panel">
@@ -565,7 +590,6 @@
             const STORAGE_KEY = "cpu_opcode_designer_state";
 
             const opcodeBitsInput = document.getElementById("opcodeBits");
-            const instructionCount = document.getElementById("instructionCount");
             const regBits = document.getElementById("regBits");
             const opcodeTable = document.getElementById("opcodeTable");
             const cpuList = document.getElementById("cpuList");
@@ -594,7 +618,7 @@
             function loadState() {
                 const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
                 if (!s) return;
-                opcodeBits = parseInt(s.opcodeBits) || 4;
+                opcodeBits = s.opcodeBits;
                 opcodeBitsInput.value = opcodeBits;
                 regBits.value = s.regBits;
                 cpuSignals = s.cpuSignals;
@@ -612,20 +636,12 @@
                 cellState = s.cellState || {};
             }
 
-            function updateInstructionCount() {
-                instructionCount.value = 1 << opcodeBits;
-            }
-
-            // Universal value-setter logic to remove bugs and clean row structural mutations
-            function setOpcodeBits(newBits) {
-                newBits = Math.max(1, parseInt(newBits) || 1);
-                if (newBits === opcodeBits) return;
-
+            function changeOpcodeBits(d) {
                 const oldOpcodeBits = opcodeBits;
                 const oldRegStart = opcodeBits;
                 const oldRegEnd = opcodeBits + parseInt(regBits.value) - 1;
 
-                opcodeBits = newBits;
+                opcodeBits = Math.max(1, opcodeBits + d);
                 opcodeBitsInput.value = opcodeBits;
 
                 const newRegStart = opcodeBits;
@@ -678,27 +694,6 @@
                 rebuild();
             }
 
-            function changeOpcodeBits(d) {
-                setOpcodeBits(opcodeBits + d);
-            }
-
-            // Event Listeners for manual entries
-            opcodeBitsInput.addEventListener('change', (e) => {
-                setOpcodeBits(e.target.value);
-            });
-
-            instructionCount.addEventListener('change', (e) => {
-                const val = Math.max(2, parseInt(e.target.value) || 2);
-                // Compute the base-2 logarithm to discover the targeted bits setting
-                const calculatedBits = Math.max(1, Math.round(Math.log2(val)));
-                setOpcodeBits(calculatedBits);
-            });
-
-            regBits.addEventListener('change', () => {
-                saveState();
-                rebuild();
-            });
-
             function triToggle(td, key) {
                 td.dataset.state =
                     td.dataset.state === "0" ? "1" :
@@ -729,7 +724,6 @@
                 };
 
                 td.onclick = () => {
-                    // Check if this cell is part of a merged cell
                     const merge = mergedCells.find(m =>
                         m.row === row &&
                         col >= m.startCol &&
@@ -737,7 +731,6 @@
                     );
 
                     if (merge) {
-                        // Clicking anywhere in merged cell selects it
                         const cell = document.querySelectorAll(`#opcodeTable tr:nth-child(${row + 2}) td`)[merge.startCol];
                         document.querySelectorAll(".merged-selected").forEach(x => x.classList.remove("merged-selected"));
                         if (cell) {
@@ -767,11 +760,9 @@
                 const regStart = opcodeBits;
                 const regEnd = opcodeBits + parseInt(regBits.value) - 1;
 
-                // Calculate actual column indices (accounting for colSpan)
                 let actualStartCol = dragStartCol;
                 let actualEndCol = endCol;
 
-                // Adjust for any merged cells in the row
                 mergedCells.filter(m => m.row === row).forEach(m => {
                     if (m.startCol < dragStartCol && dragStartCol < m.startCol + m.span) {
                         actualStartCol = m.startCol;
@@ -785,14 +776,12 @@
                 const end = Math.max(actualStartCol, actualEndCol);
                 const span = end - start + 1;
 
-                // ONLY allow merging in the register section
                 const inRegisterSection =
                     (start >= regStart && start <= regEnd) &&
                     (end >= regStart && end <= regEnd);
 
                 if (!inRegisterSection) return;
 
-                // Check for overlap with existing merges
                 const overlap = mergedCells.some(m =>
                     m.row === row &&
                     !(end < m.startCol || start > m.startCol + m.span - 1)
@@ -860,7 +849,6 @@
 
             function buildTable() {
                 opcodeTable.innerHTML = "";
-                updateInstructionCount();
 
                 const rows = 1 << opcodeBits;
                 const regStart = opcodeBits;
@@ -917,9 +905,7 @@
                         tr.appendChild(td);
                     }
 
-                    // Apply merged cells for this row
                     mergedCells.filter(m => m.row === r).forEach(m => {
-                        // Only merge if within register section
                         if (m.startCol >= regStart && m.startCol <= regEnd) {
                             const cell = tr.children[m.startCol];
                             cell.colSpan = m.span;
@@ -929,7 +915,6 @@
                                 selectedMerge = m;
                             };
 
-                            // Remove the merged cells (but keep their state in cellState)
                             for (let i = 1; i < m.span; i++) {
                                 const mergedIndex = m.startCol + i;
                                 if (tr.children[mergedIndex]) {
@@ -949,7 +934,6 @@
             rebuild();
 
             // Boolean Algebra Tool Script
-            // ----------------- Utilities -----------------
             function highlight(expr) {
                 expr = expr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 return expr.replace(/[\(\)]/g, m => `<span class="neon-bracket">${m}</span>`)
@@ -964,7 +948,6 @@
                 try { return !!Function('"use strict";return (' + e + ');')(); } catch (err) { throw new Error('Invalid expression'); }
             }
 
-            // ----------------- Truth table -----------------
             function generateTruthTable(expr, vars) {
                 const n = vars.length, rows = 1 << n, results = [];
                 for (let i = 0; i < rows; i++) {
@@ -975,7 +958,6 @@
                 return results.map(r => ({ map: r.map, out: r.out }));
             }
 
-            // ----------------- Simplifier -----------------
             function bitsOf(n, width) {
                 let s = n.toString(2);
                 while (s.length < width) s = '0' + s;
@@ -1105,7 +1087,6 @@
                 return selected.map(p => '(' + termToExpr(p, vars) + ')').join(' | ');
             }
 
-            // ----------------- K-map -----------------
             function gray(n) { if (n === 1) return ['0', '1']; const prev = gray(n - 1); return prev.map(x => '0' + x).concat(prev.slice().reverse().map(x => '1' + x)); }
             function buildKMapGrid(vars, results) { const n = vars.length; if (n < 2 || n > 4) return null; const grid = { rows: 0, cols: 0, cells: [] }; const gray2 = ['00', '01', '11', '10']; if (n === 2) { grid.rows = 2; grid.cols = 2; for (let r = 0; r < 2; r++) { grid.cells[r] = []; for (let c = 0; c < 2; c++) { const map = {}; map[vars[0]] = !!r; map[vars[1]] = !!c; const found = results.find(row => vars.every(v => row.map[v] === map[v])); grid.cells[r][c] = { val: found ? (found.out ? 1 : 0) : 0, minterm: found ? results.indexOf(found) : -1 }; } } return grid; } if (n === 3) { grid.rows = 2; grid.cols = 4; const colsGray = ['00', '01', '11', '10']; for (let r = 0; r < 2; r++) { grid.cells[r] = []; for (let c = 0; c < 4; c++) { const map = {}; map[vars[0]] = !!r; map[vars[1]] = colsGray[c][0] === '1'; map[vars[2]] = colsGray[c][1] === '1'; const found = results.find(row => vars.every(v => row.map[v] === map[v])); grid.cells[r][c] = { val: found ? (found.out ? 1 : 0) : 0, minterm: found ? results.indexOf(found) : -1 }; } } return grid; } if (n === 4) { grid.rows = 4; grid.cols = 4; for (let r = 0; r < 4; r++) { grid.cells[r] = []; for (let c = 0; c < 4; c++) { const map = {}; map[vars[0]] = gray2[r][0] === '1'; map[vars[1]] = gray2[r][1] === '1'; map[vars[2]] = gray2[c][0] === '1'; map[vars[3]] = gray2[c][1] === '1'; const found = results.find(row => vars.every(v => row.map[v] === map[v])); grid.cells[r][c] = { val: found ? (found.out ? 1 : 0) : 0, minterm: found ? results.indexOf(found) : -1 }; } } return grid; } return null; }
             function allRectanglesForSize(rows, cols, size) { const rects = []; for (let h = 1; h <= rows; h *= 2) { for (let w = 1; w <= cols; w *= 2) { if (h * w === size) rects.push([h, w]); } } return rects; }
@@ -1115,7 +1096,6 @@
                 const n = vars.length; if (n < 2 || n > 4) { container.innerHTML = ''; return null; }
                 const grid = buildKMapGrid(vars, results);
 
-                // table
                 const table = document.createElement('table'); table.className = 'kmap-table'; const tbody = document.createElement('tbody');
                 const header = document.createElement('tr'); header.appendChild(document.createElement('th'));
                 const gray2 = ['00', '01', '11', '10'];
@@ -1137,7 +1117,6 @@
                 const groups = findKMapGroups(grid);
                 const colors = ['rgba(255,0,0,0.18)', 'rgba(0,255,0,0.18)', 'rgba(0,0,255,0.18)', 'rgba(255,255,0,0.18)', 'rgba(0,255,255,0.18)', 'rgba(255,0,255,0.18)'];
 
-                // compute exact cell rects
                 const cellRects = []; for (let r = 0; r < table.rows.length; r++) { cellRects[r] = []; for (let c = 0; c < table.rows[r].cells.length; c++) { const rect = table.rows[r].cells[c].getBoundingClientRect(); const parentRect = table.getBoundingClientRect(); cellRects[r][c] = { x: rect.left - parentRect.left, y: rect.top - parentRect.top, width: rect.width, height: rect.height }; } }
 
                 for (let gi = 0; gi < groups.length; gi++) {
@@ -1155,23 +1134,22 @@
             function thCell(txt) { const t = document.createElement('th'); t.textContent = txt; return t; }
             function tdCell(txt) { const t = document.createElement('td'); t.textContent = txt; return t; }
 
-            // ----------------- Button handler -----------------
             document.getElementById('genBtn').addEventListener('click', () => {
                 const expr = document.getElementById('expr').value.toUpperCase();
                 document.getElementById('highlight').innerHTML = highlight(expr);
                 const vars = getVars(expr);
                 if (vars.length > 4) { alert('Supports max 4 variables.'); return; }
                 const results = generateTruthTable(expr, vars);
-                // table
+                
                 const tbl = document.getElementById('table'); tbl.innerHTML = ''; const ttable = document.createElement('table'); ttable.appendChild(document.createElement('thead')); const thRow = document.createElement('tr'); vars.forEach(v => { const th = document.createElement('th'); th.textContent = v; thRow.appendChild(th); }); thRow.appendChild(document.createElement('th')).textContent = 'OUT'; ttable.querySelector('thead').appendChild(thRow); const tbody = document.createElement('tbody'); results.forEach(r => { const tr = document.createElement('tr'); vars.forEach(v => { const td = document.createElement('td'); td.textContent = r.map[v] ? 1 : 0; tr.appendChild(td); }); const td = document.createElement('td'); td.textContent = r.out ? 1 : 0; tr.appendChild(td); tbody.appendChild(tr); }); ttable.appendChild(tbody); tbl.appendChild(ttable);
-                // K-map
+                
                 const kmapWrap = document.getElementById('kmap'); kmapWrap.innerHTML = ''; const groups = renderKMap(vars, results, kmapWrap);
-                // legend
+                
                 const legendDiv = document.getElementById('legend'); legendDiv.innerHTML = ''; const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff']; groups.forEach((g, i) => { const pill = document.createElement('div'); pill.className = 'group-pill'; pill.style.backgroundColor = colors[i % colors.length]; pill.textContent = 'Group size ' + g.size; legendDiv.appendChild(pill); });
-                // simplified
+                
                 document.getElementById('simplified').textContent = qmSimplify(expr, vars, results);
             });
-            // Smooth scrolling for sidebar links
+
             document.querySelectorAll('.sidebar-link[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -1188,30 +1166,20 @@
                 });
             });
 
-            // Fixed Excel Export Function
             function exportToExcel() {
                 try {
                     showExportStatus('Preparing export...', '#0ff');
 
-                    // Create workbook
                     const wb = XLSX.utils.book_new();
-
-                    // Get the table from the UI
                     const table = document.getElementById('opcodeTable');
                     const totalInstructions = 1 << opcodeBits;
-
-                    // Create the main data sheet with proper structure
                     const mainData = [];
-
-                    // Headers: Single row with descriptive headers
                     const headers = ['Opcode (Binary)'];
 
-                    // Add register columns
                     for (let i = 0; i < parseInt(regBits.value); i++) {
                         headers.push(`R${i}`);
                     }
 
-                    // Add CPU signal columns (including sfg)
                     for (let i = 0; i < cpuSignals.length; i++) {
                         headers.push(cpuSignals[i]);
                     }
@@ -1219,9 +1187,7 @@
                     headers.push('Mnemonic', 'Description', 'Pseudocode');
                     mainData.push(headers);
 
-                    // Helper function to get cell value with merged cell support
                     const getCellValue = (rowIndex, colIndex) => {
-                        // Check if this cell is part of a merged group
                         const merge = mergedCells.find(m =>
                             m.row === rowIndex &&
                             colIndex >= m.startCol &&
@@ -1229,37 +1195,29 @@
                         );
 
                         if (merge) {
-                            // Use the value from the first cell of the merged group
                             const key = `${rowIndex}-${merge.startCol}`;
                             return cellState[key]?.state || '0';
                         }
 
-                        // Not merged, get individual cell value
                         const key = `${rowIndex}-${colIndex}`;
                         return cellState[key]?.state || '0';
                     };
 
-                    // Process each instruction
                     for (let row = 0; row < totalInstructions; row++) {
                         const rowData = [];
-
-                        // 1. Opcode as single binary string (4 bits in one column)
                         const opcodeBinary = row.toString(2).padStart(opcodeBits, '0');
                         rowData.push(opcodeBinary);
 
-                        // 2. Register bits
                         for (let i = 0; i < parseInt(regBits.value); i++) {
                             const colIndex = opcodeBits + i;
                             rowData.push(getCellValue(row, colIndex));
                         }
 
-                        // 3. CPU signals (including sfg and all other signals)
                         for (let i = 0; i < cpuSignals.length; i++) {
                             const colIndex = opcodeBits + parseInt(regBits.value) + i;
                             rowData.push(getCellValue(row, colIndex));
                         }
 
-                        // 4. Text fields
                         for (let i = 0; i < 3; i++) {
                             const key = `${row}-text-${i}`;
                             rowData.push(cellState[key]?.text || '');
@@ -1268,31 +1226,22 @@
                         mainData.push(rowData);
                     }
 
-                    // Create main worksheet
                     const mainWs = XLSX.utils.aoa_to_sheet(mainData);
+                    const mainColWidths = [{ wch: opcodeBits + 2 }];
 
-                    // Style main sheet with proper column widths
-                    const mainColWidths = [
-                        { wch: opcodeBits + 2 }, // Opcode binary column
-                    ];
-
-                    // Register columns
                     for (let i = 0; i < parseInt(regBits.value); i++) {
                         mainColWidths.push({ wch: 6 });
                     }
 
-                    // CPU signal columns - ensure sfg and all signals have proper width
                     for (let i = 0; i < cpuSignals.length; i++) {
                         mainColWidths.push({ wch: Math.max(cpuSignals[i].length + 2, 8) });
                     }
 
-                    // Text columns
                     mainColWidths.push({ wch: 20 }, { wch: 30 }, { wch: 25 });
                     mainWs['!cols'] = mainColWidths;
 
                     XLSX.utils.book_append_sheet(wb, mainWs, 'ISA Data');
 
-                    // Create a detailed view with opcode in multiple formats
                     const detailedData = [];
                     const detailedHeaders = [
                         'Instruction #',
@@ -1301,12 +1250,10 @@
                         'Opcode (Binary)',
                     ];
 
-                    // Add register columns
                     for (let i = 0; i < parseInt(regBits.value); i++) {
                         detailedHeaders.push(`R${i}`);
                     }
 
-                    // Add CPU signal columns
                     for (let i = 0; i < cpuSignals.length; i++) {
                         detailedHeaders.push(cpuSignals[i]);
                     }
@@ -1316,33 +1263,23 @@
 
                     for (let row = 0; row < totalInstructions; row++) {
                         const rowData = [];
-
-                        // Instruction number
                         rowData.push(row);
-
-                        // Opcode in decimal
                         rowData.push(row);
-
-                        // Opcode in hex (padded)
+                        
                         const hexDigits = Math.ceil(opcodeBits / 4);
                         rowData.push(row.toString(16).toUpperCase().padStart(hexDigits, '0'));
-
-                        // Opcode in binary
                         rowData.push(row.toString(2).padStart(opcodeBits, '0'));
 
-                        // Register bits
                         for (let i = 0; i < parseInt(regBits.value); i++) {
                             const colIndex = opcodeBits + i;
                             rowData.push(getCellValue(row, colIndex));
                         }
 
-                        // CPU signals (make sure sfg and all signals are included)
                         for (let i = 0; i < cpuSignals.length; i++) {
                             const colIndex = opcodeBits + parseInt(regBits.value) + i;
                             rowData.push(getCellValue(row, colIndex));
                         }
 
-                        // Text fields
                         for (let i = 0; i < 3; i++) {
                             const key = `${row}-text-${i}`;
                             rowData.push(cellState[key]?.text || '');
@@ -1352,13 +1289,11 @@
                     }
 
                     const detailedWs = XLSX.utils.aoa_to_sheet(detailedData);
-
-                    // Style detailed sheet
                     const detailedColWidths = [
-                        { wch: 12 }, // Instruction #
-                        { wch: 10 }, // Opcode (Dec)
-                        { wch: 8 },  // Opcode (Hex)
-                        { wch: opcodeBits + 2 }, // Opcode (Binary)
+                        { wch: 12 },
+                        { wch: 10 },
+                        { wch: 8 },
+                        { wch: opcodeBits + 2 },
                     ];
 
                     for (let i = 0; i < parseInt(regBits.value); i++) {
@@ -1374,17 +1309,13 @@
 
                     XLSX.utils.book_append_sheet(wb, detailedWs, 'Detailed View');
 
-                    // Create a sheet showing the visual table structure (for reference)
                     const tableData = [];
-
-                    // Add the actual table headers from the UI
                     for (let i = 0; i < table.rows.length; i++) {
                         const row = table.rows[i];
                         const rowData = [];
 
                         for (let j = 0; j < row.cells.length; j++) {
                             const cell = row.cells[j];
-
                             let cellValue = '';
                             if (cell.classList.contains('readonly')) {
                                 cellValue = cell.textContent || '';
@@ -1395,17 +1326,14 @@
                             } else {
                                 cellValue = cell.textContent || '';
                             }
-
                             rowData.push(cellValue);
                         }
-
                         tableData.push(rowData);
                     }
 
                     const tableWs = XLSX.utils.aoa_to_sheet(tableData);
                     XLSX.utils.book_append_sheet(wb, tableWs, 'Table View');
 
-                    // Create configuration sheet
                     const configData = [
                         ['CPU Design Configuration'],
                         [''],
@@ -1439,13 +1367,11 @@
                     const configWs = XLSX.utils.aoa_to_sheet(configData);
                     XLSX.utils.book_append_sheet(wb, configWs, 'Configuration');
 
-                    // Save file
                     const fileName = `CPU_Design_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
                     XLSX.writeFile(wb, fileName);
 
                     showExportStatus('Export completed successfully!', '#0f0');
 
-                    // Clear success message after 3 seconds
                     setTimeout(() => {
                         const statusDiv = document.getElementById('exportStatus');
                         if (statusDiv) {
@@ -1460,7 +1386,6 @@
                 }
             }
 
-            // Helper function to show export status
             function showExportStatus(message, color) {
                 const statusDiv = document.getElementById('exportStatus');
                 if (statusDiv) {
@@ -1469,6 +1394,7 @@
                 }
             }
         </script>
-    </div> </body>
+    </div>
+</body>
 
 </html>
