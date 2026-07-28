@@ -436,7 +436,6 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
     <div id="sidebar">
         <h3>Navigation</h3>
         <div class="sidebar-content">
@@ -481,23 +480,21 @@
         </div>
     </div>
 
-    <!-- Main Content Wrapper -->
     <div id="content-wrapper">
-        <!-- CPU Opcode Designer -->
         <section id="spreadsheet">
             <h2>CPU Opcode & Control Word Designer</h2>
 
             <div class="controls" id="controls">
                 <label>Opcode bits
                     <div>
-                        <button onclick="changeOpcodeBits(-1)">÷2</button>
-                        <input id="opcodeBits" value="4" readonly>
-                        <button onclick="changeOpcodeBits(1)">×2</button>
+                        <button onclick="changeOpcodeBits(-1)">-1</button>
+                        <input type="number" id="opcodeBits" value="4" min="1">
+                        <button onclick="changeOpcodeBits(1)">+1</button>
                     </div>
                 </label>
 
                 <label>Instruction count
-                    <input id="instructionCount" readonly>
+                    <input type="number" id="instructionCount" min="2">
                 </label>
 
                 <label>Register bits
@@ -520,7 +517,6 @@
             </div>
         </section>
 
-        <!-- Boolean Algebra simplification Tool -->
         <section id="boolean-tool">
             <div class="wrap">
                 <h1>Boolean Algebra Tool — Truth Table · K-Map · Simplifier</h1>
@@ -598,7 +594,7 @@
             function loadState() {
                 const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
                 if (!s) return;
-                opcodeBits = s.opcodeBits;
+                opcodeBits = parseInt(s.opcodeBits) || 4;
                 opcodeBitsInput.value = opcodeBits;
                 regBits.value = s.regBits;
                 cpuSignals = s.cpuSignals;
@@ -620,20 +616,23 @@
                 instructionCount.value = 1 << opcodeBits;
             }
 
-            function changeOpcodeBits(d) {
+            // Universal value-setter logic to remove bugs and clean row structural mutations
+            function setOpcodeBits(newBits) {
+                newBits = Math.max(1, parseInt(newBits) || 1);
+                if (newBits === opcodeBits) return;
+
                 const oldOpcodeBits = opcodeBits;
                 const oldRegStart = opcodeBits;
                 const oldRegEnd = opcodeBits + parseInt(regBits.value) - 1;
 
-                opcodeBits = Math.max(1, opcodeBits + d);
+                opcodeBits = newBits;
                 opcodeBitsInput.value = opcodeBits;
 
                 const newRegStart = opcodeBits;
-                const delta = opcodeBits - oldOpcodeBits; // Positive when adding, negative when removing
+                const delta = opcodeBits - oldOpcodeBits;
 
                 // Update merged cells positions
                 mergedCells = mergedCells.map(m => {
-                    // If the merged cell is in the register section
                     if (m.startCol >= oldRegStart && m.startCol <= oldRegEnd) {
                         return {
                             ...m,
@@ -651,23 +650,19 @@
                         let row = parseInt(match[1]);
                         let col = parseInt(match[2]);
 
-                        // If this cell is in the register or control signal section (after opcode bits)
                         if (col >= oldRegStart) {
                             col += delta;
                         }
 
                         newCellState[`${row}-${col}`] = cellState[key];
                     } else {
-                        // This is a text field (key format: `${row}-text-${i}`)
                         newCellState[key] = cellState[key];
                     }
                 }
 
-                // If decreasing opcode bits, remove data for instructions that no longer exist
                 if (opcodeBits < oldOpcodeBits) {
                     const newMaxRows = 1 << opcodeBits;
 
-                    // Clear cellState for rows beyond new max
                     for (const key in newCellState) {
                         const match = key.match(/^(\d+)-/);
                         if (match && parseInt(match[1]) >= newMaxRows) {
@@ -675,7 +670,6 @@
                         }
                     }
 
-                    // Clear mergedCells for rows beyond new max
                     mergedCells = mergedCells.filter(m => m.row < newMaxRows);
                 }
 
@@ -683,6 +677,27 @@
                 saveState();
                 rebuild();
             }
+
+            function changeOpcodeBits(d) {
+                setOpcodeBits(opcodeBits + d);
+            }
+
+            // Event Listeners for manual entries
+            opcodeBitsInput.addEventListener('change', (e) => {
+                setOpcodeBits(e.target.value);
+            });
+
+            instructionCount.addEventListener('change', (e) => {
+                const val = Math.max(2, parseInt(e.target.value) || 2);
+                // Compute the base-2 logarithm to discover the targeted bits setting
+                const calculatedBits = Math.max(1, Math.round(Math.log2(val)));
+                setOpcodeBits(calculatedBits);
+            });
+
+            regBits.addEventListener('change', () => {
+                saveState();
+                rebuild();
+            });
 
             function triToggle(td, key) {
                 td.dataset.state =
@@ -1454,7 +1469,6 @@
                 }
             }
         </script>
-    </div> <!-- Close content-wrapper -->
-</body>
+    </div> </body>
 
 </html>
